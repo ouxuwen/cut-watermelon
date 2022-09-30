@@ -13,7 +13,7 @@ module.exports = {
     'react/no-this-in-sfc': 'off',
     'no-plusplus': 'off',
     'no-console': 'off',
-    'object-curly-newline': 'off'
+    'object-curly-newline': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,
