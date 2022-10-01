@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/media-has-caption */
 import React, { useEffect } from 'react';
-import { HolisticUtils } from '../post-utils';
+import holistic from '../post-utils';
 import './post-preview.less';
 
 function PostPreview() {
@@ -9,10 +9,11 @@ function PostPreview() {
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const holistic = new HolisticUtils({
+    holistic.init({
       videoEle: videoRef.current as HTMLVideoElement,
       canvasEle: canvasRef.current as HTMLCanvasElement,
     });
+    holistic.start();
 
     return () => {};
   }, []);

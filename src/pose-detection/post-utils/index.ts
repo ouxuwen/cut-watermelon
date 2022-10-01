@@ -10,13 +10,11 @@ export interface HolisticUtilsOptions {
 export class HolisticUtils {
   private holistic;
 
-  private videoEle;
+  private videoEle!: HTMLVideoElement;
 
-  private canvasEle;
+  private canvasEle!: HTMLCanvasElement;
 
-  constructor({ canvasEle, videoEle }: HolisticUtilsOptions) {
-    this.videoEle = videoEle;
-    this.canvasEle = canvasEle;
+  constructor() {
     this.holistic = new Holistic({
       locateFile: (file: string) => `/holistic/${file}`
       //  return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
@@ -30,8 +28,15 @@ export class HolisticUtils {
       refineFaceLandmarks: true,
     });
     // 通过整体回调函数
-    this.holistic.onResults(this.onResults);
+    this.holistic.onResults(this.onResults.bind(this));
+  }
 
+  init({ canvasEle, videoEle }: HolisticUtilsOptions) {
+    this.videoEle = videoEle;
+    this.canvasEle = canvasEle;
+  }
+
+  start() {
     //  使用 `Mediapipe` 工具来获取相机 -较低的分辨率 = 较高的 fps
     const camera = new Camera(this.videoEle, {
       onFrame: async () => {
@@ -49,6 +54,7 @@ export class HolisticUtils {
   }
 
   drawResults(results: any) {
+    console.log(results);
     this.canvasEle.width = this.videoEle.videoWidth;
     this.canvasEle.height = this.videoEle.videoHeight;
     const canvasCtx = this.canvasEle.getContext('2d') as CanvasRenderingContext2D;
@@ -92,3 +98,5 @@ export class HolisticUtils {
     });
   }
 }
+
+export default new HolisticUtils();
