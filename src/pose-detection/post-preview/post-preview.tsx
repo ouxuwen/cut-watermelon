@@ -20,7 +20,7 @@ function PostPreview() {
 
   return (
     <div className="post-preview">
-      <video className="preview-video" ref={videoRef} />
+      <video className="preview-video" ref={videoRef} autoPlay muted />
       <canvas className="preview-canvas" ref={canvasRef} />
     </div>
   );

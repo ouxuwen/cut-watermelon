@@ -1,6 +1,10 @@
 import { FACEMESH_TESSELATION, HAND_CONNECTIONS, Holistic, POSE_CONNECTIONS } from '@mediapipe/holistic';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { Camera } from '@mediapipe/camera_utils';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import modelAnimate from './model-animate';
+import VrmModel from './models/vrm-model';
 
 export interface HolisticUtilsOptions {
   canvasEle: HTMLCanvasElement;
@@ -13,6 +17,8 @@ export class HolisticUtils {
   private videoEle!: HTMLVideoElement;
 
   private canvasEle!: HTMLCanvasElement;
+
+  private scene!: THREE.Scene;
 
   constructor() {
     this.holistic = new Holistic({
@@ -34,6 +40,18 @@ export class HolisticUtils {
   init({ canvasEle, videoEle }: HolisticUtilsOptions) {
     this.videoEle = videoEle;
     this.canvasEle = canvasEle;
+
+    // 初始化三维动画元素；
+    modelAnimate.setVideoEle(this.videoEle);
+
+    // 创建Three
+    this.createThreeSence();
+
+    // 加载三维人物
+    const vrmModel = new VrmModel();
+    vrmModel.loadModel(this.scene, () => {
+      modelAnimate.setModel(vrmModel);
+    });
   }
 
   start() {
@@ -48,13 +66,55 @@ export class HolisticUtils {
     camera.start();
   }
 
+  createThreeSence() {
+    // renderer
+    const renderer = new THREE.WebGLRenderer({ alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    document.body.appendChild(renderer.domElement);
+
+    // camera
+    const orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
+    orbitCamera.position.set(0.0, 1.4, 0.7);
+
+    // controls
+    const orbitControls = new OrbitControls(orbitCamera, renderer.domElement);
+    orbitControls.screenSpacePanning = true;
+    orbitControls.target.set(0.0, 1.4, 0.0);
+    orbitControls.update();
+
+    // scene
+    this.scene = new THREE.Scene();
+
+    // light
+    const light = new THREE.DirectionalLight(0xffffff);
+    light.position.set(1.0, 1.0, 1.0).normalize();
+    this.scene.add(light);
+
+    // Main Render Loop
+    const clock = new THREE.Clock();
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+
+      if (modelAnimate.model) {
+        // 更新模型
+        modelAnimate.model.update(clock.getDelta());
+      }
+      renderer.render(this.scene, orbitCamera);
+    };
+    animate();
+  }
+
   onResults(results: any) {
     // 绘制识别结果
     this.drawResults(results);
+
+    // 开始动画
+    modelAnimate.run(results);
   }
 
   drawResults(results: any) {
-    console.log(results);
     this.canvasEle.width = this.videoEle.videoWidth;
     this.canvasEle.height = this.videoEle.videoHeight;
     const canvasCtx = this.canvasEle.getContext('2d') as CanvasRenderingContext2D;
