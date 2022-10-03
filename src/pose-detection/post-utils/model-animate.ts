@@ -139,15 +139,15 @@ class ModelAnimate {
 
       rigRotation('Chest', riggedPose.Spine, 0.25, 0.3);
       rigRotation('Spine', riggedPose.Spine, 0.45, 0.3);
-      rigRotation('RightUpperArm', riggedPose.RightUpperArm, 1, 1);
-      rigRotation('RightLowerArm', riggedPose.RightLowerArm, 1, 1);
-      rigRotation('LeftUpperArm', riggedPose.LeftUpperArm, 1, 0.3);
-      rigRotation('LeftLowerArm', riggedPose.LeftLowerArm, 1, 0.3);
+      rigRotation('RightUpperArm', riggedPose.RightUpperArm, 1, 0.7);
+      rigRotation('RightLowerArm', riggedPose.RightLowerArm, 1, 0.7);
+      rigRotation('LeftUpperArm', riggedPose.LeftUpperArm, 1, 0.7);
+      rigRotation('LeftLowerArm', riggedPose.LeftLowerArm, 1, 0.7);
 
-      rigRotation('LeftUpperLeg', riggedPose.LeftUpperLeg, 1, 0.3);
-      rigRotation('LeftLowerLeg', riggedPose.LeftLowerLeg, 1, 0.3);
-      rigRotation('RightUpperLeg', riggedPose.RightUpperLeg, 1, 1);
-      rigRotation('RightLowerLeg', riggedPose.RightLowerLeg, 1, 1);
+      rigRotation('LeftUpperLeg', riggedPose.LeftUpperLeg, 1, 0.7);
+      rigRotation('LeftLowerLeg', riggedPose.LeftLowerLeg, 1, 0.7);
+      rigRotation('RightUpperLeg', riggedPose.RightUpperLeg, 1, 0.7);
+      rigRotation('RightLowerLeg', riggedPose.RightLowerLeg, 1, 0.7);
     }
 
     // Animate Hands

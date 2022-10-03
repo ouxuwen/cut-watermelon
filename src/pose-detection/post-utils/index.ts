@@ -75,7 +75,7 @@ export class HolisticUtils {
 
     // camera
     const orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
-    orbitCamera.position.set(0.0, 1.4, 0.7);
+    orbitCamera.position.set(0.0, 1.4, 5);
 
     // controls
     const orbitControls = new OrbitControls(orbitCamera, renderer.domElement);
@@ -115,8 +115,8 @@ export class HolisticUtils {
   }
 
   drawResults(results: any) {
-    this.canvasEle.width = this.videoEle.videoWidth;
-    this.canvasEle.height = this.videoEle.videoHeight;
+    this.canvasEle.width = this.videoEle.clientWidth;
+    this.canvasEle.height = this.videoEle.clientHeight;
     const canvasCtx = this.canvasEle.getContext('2d') as CanvasRenderingContext2D;
     canvasCtx.save();
     canvasCtx.clearRect(0, 0, this.canvasEle.width, this.canvasEle.height);

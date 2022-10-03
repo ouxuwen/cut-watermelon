@@ -13,7 +13,7 @@ export default class VrmModel implements BaseModel {
     loader.crossOrigin = 'anonymous';
     // Import model from URL, add your own model here
     loader.load(
-      '/models/Ashtra.vrm',
+      '/models/Aether.vrm',
       (gltf) => {
         VRMUtils.removeUnnecessaryJoints(gltf.scene);
         const { vrm } = gltf.userData;
