@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import createScene from './Scene';
 
 function App() {
-  return (
-    <div className="App">
-      hello world
-    </div>
-  );
+  useEffect(() => {
+    createScene();
+  });
+
+  return <div id="App" />;
 }
 
 export default App;
