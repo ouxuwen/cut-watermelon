@@ -49,7 +49,7 @@ function createMesh(fbxPath: string, texturePath: string, position: Position) {
 
 function createPhysicsBox(position: Position) {
   // Sphere参数为球体的半径
-  const sphereShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
+  const sphereShape = new CANNON.Box(new CANNON.Vec3(0.05, 0.05, 0.05));
   const defaultMaterial = new CANNON.Material('default');
   const sphereBody = new CANNON.Body({
     // 刚体的质量mass，质量为0的物体为静止的物体
@@ -68,9 +68,9 @@ export default async function getPhysicsModels() {
     const fbxName = `/scene-resource/fbx/${modelName[i]}_LOD4.fbx`;
     const imgName = `/scene-resource/image/${modelName[i]}_2K_Albedo.jpg`;
     const position = {
-      x: 1,
-      y: 2,
-      z: 2,
+      x: -1,
+      y: 0,
+      z: (Math.random() - 0.5) * 3,
     };
     meshPromises.push(createMesh(fbxName, imgName, position));
     physicsBoxes.push(createPhysicsBox(position));

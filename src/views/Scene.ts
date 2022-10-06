@@ -2,6 +2,8 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import CannonDebugger from 'cannon-es-debugger';
+// import * as dat from 'dat.gui';
 import holisticUtils from '../pose-detection/post-utils';
 
 import getPhysicsModels from './Model';
@@ -69,7 +71,7 @@ export default async function createScene() {
 
   // ----------------3.设置相机----------------
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-  camera.position.set(-10, 15, 3);
+  camera.position.set(-5, 0, 0);
   scene.add(camera);
 
   // ----------------4.设置灯光----------------
@@ -134,22 +136,25 @@ export default async function createScene() {
       const deltaTime = elapsedTime - oldElapsedTime;
       oldElapsedTime = elapsedTime;
       world.fixedStep(1 / 60, deltaTime);
-      const arr = analyser.getFrequencyData();
+      // const arr = analyser.getFrequencyData();
       // console.log('arr[1]', arr[1]);
       for (let i = 0; i < meshes.length; i++) {
         if (meshes[i]) {
-          if (meshes[i].position.y <= 2 && arr[i] > 0) {
-            physicsBoxes[i].applyForce(
-              new CANNON.Vec3(0, arr[i] / 50, 0),
-              physicsBoxes[i].position,
-            );
-          }
+          // if (meshes[i].position.y <= 2 && arr[i] > 0) {
+          //   physicsBoxes[i].applyForce(
+          //     new CANNON.Vec3(0, arr[i] / 50, 0),
+          //     physicsBoxes[i].position,
+          //   );
+          // }
           meshes[i].position.copy(physicsBoxes[i].position);
           meshes[i].quaternion.copy(physicsBoxes[i].quaternion);
         }
       }
     }
   };
+
+  // Debug调试物理世界刚体
+  const cannonDebugger = CannonDebugger(scene, world, {});
 
   const render = () => {
     // 更新控制器
@@ -161,6 +166,8 @@ export default async function createScene() {
     // 定时更新
     requestAnimationFrame(render);
 
+    // Debug调试物理世界刚体
+    cannonDebugger.update(); // Update the CannonDebugger meshes
     // 更新人物
     holisticUtils.renderModel();
   };
