@@ -46,7 +46,11 @@ export function startGame() {
   }
 }
 
+let isCreate = false;
 export default async function createScene() {
+  if (isCreate) return;
+  isCreate = true;
+  console.log('createScene');
   // ----------------1.创建场景----------------
   const scene = new THREE.Scene();
   holisticUtils.setSence(scene);

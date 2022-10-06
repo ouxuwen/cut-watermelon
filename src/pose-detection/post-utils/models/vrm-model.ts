@@ -15,6 +15,7 @@ export default class VrmModel implements BaseModel {
     loader.load(
       '/models/Aether.vrm',
       (gltf) => {
+        console.log('load end');
         VRMUtils.removeUnnecessaryJoints(gltf.scene);
         const { vrm } = gltf.userData;
         this.model = vrm;
