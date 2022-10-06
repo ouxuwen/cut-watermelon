@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import holisticUtils from '../pose-detection/post-utils';
 
 import getPhysicsModels from './Model';
 
@@ -48,6 +49,8 @@ export function startGame() {
 export default async function createScene() {
   // ----------------1.创建场景----------------
   const scene = new THREE.Scene();
+  holisticUtils.setSence(scene);
+
   // 加载hdr环境贴图
   const rgbeLoader = new RGBELoader();
   rgbeLoader.loadAsync('/scene-resource/050.hdr').then((texture: THREE.DataTexture) => {
@@ -66,7 +69,7 @@ export default async function createScene() {
 
   // ----------------3.设置相机----------------
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-  camera.position.set(-30, 5, 10);
+  camera.position.set(-10, 15, 3);
   scene.add(camera);
 
   // ----------------4.设置灯光----------------
@@ -75,7 +78,7 @@ export default async function createScene() {
   scene.add(light);
   // 直线光
   const lineLight = new THREE.DirectionalLight(0xffffff);
-  lineLight.position.set(-100, 10, 10);
+  lineLight.position.set(-100, 10, 5);
   scene.add(lineLight);
 
   // ----------------5.初始化渲染器----------------
@@ -102,7 +105,7 @@ export default async function createScene() {
   const defaultMaterial = new CANNON.Material('default');
   // friction 表示摩擦力，restitution 为弹性，1 为回弹到原始位置
   const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
-    friction: 0.7,
+    friction: 1,
     restitution: 0,
   });
   world.addContactMaterial(defaultContactMaterial);
@@ -132,7 +135,7 @@ export default async function createScene() {
       oldElapsedTime = elapsedTime;
       world.fixedStep(1 / 60, deltaTime);
       const arr = analyser.getFrequencyData();
-      console.log('arr[1]', arr[1]);
+      // console.log('arr[1]', arr[1]);
       for (let i = 0; i < meshes.length; i++) {
         if (meshes[i]) {
           if (meshes[i].position.y <= 2 && arr[i] > 0) {
@@ -157,6 +160,9 @@ export default async function createScene() {
     renderer.render(scene, camera);
     // 定时更新
     requestAnimationFrame(render);
+
+    // 更新人物
+    holisticUtils.renderModel();
   };
 
   render();

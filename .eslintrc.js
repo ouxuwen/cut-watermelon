@@ -14,6 +14,7 @@ module.exports = {
     'no-plusplus': 'off',
     'no-console': 'off',
     'object-curly-newline': 'off',
+    'max-len': ['error', { code: 150 }],
   },
   parserOptions: {
     ecmaVersion: 2020,

@@ -29,7 +29,7 @@ function createMesh(fbxPath: string, texturePath: string, position: Position) {
       fbxPath,
       (loadedModel: THREE.Group) => {
         const mesh: any = loadedModel.children[0].clone();
-        mesh.scale.set(0.1, 0.1, 0.1);
+        mesh.scale.set(0.01, 0.01, 0.01);
         mesh.material.map = textureAlbedo;
         const vector = new THREE.Vector3(position.x, position.y, position.z);
         mesh.position.set(vector.x, vector.y, vector.z);
@@ -68,9 +68,9 @@ export default async function getPhysicsModels() {
     const fbxName = `/scene-resource/fbx/${modelName[i]}_LOD4.fbx`;
     const imgName = `/scene-resource/image/${modelName[i]}_2K_Albedo.jpg`;
     const position = {
-      x: (Math.random() - 0.5) * 30,
+      x: 1,
       y: 2,
-      z: 5,
+      z: 2,
     };
     meshPromises.push(createMesh(fbxName, imgName, position));
     physicsBoxes.push(createPhysicsBox(position));
