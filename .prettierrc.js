@@ -8,7 +8,7 @@ module.exports = {
   jsxSingleQuote: false,
   trailingComma: 'all', // 尾随逗号
   bracketSpacing: true, // 大括号和对象字面量之间是否加空格
-  jsxBracketSameLine: true, // jsx 中是否把尖括号放在元素同一行
+  jsxBracketSameLine: false, // jsx 中是否把尖括号放在元素同一行
   arrowParens: 'always', // 何时在箭头函数参数加括号
   rangeStart: 0,
   rangeEnd: Infinity,

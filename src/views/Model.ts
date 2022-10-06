@@ -5,11 +5,11 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 const modelName = [
   'tefadiqla',
   'tegqfetla',
+  'tesrabopa',
   'tgmkaehpa',
   'tguocjppa',
-  'ti2jdifva',
   'tjciddjqx',
-  'tkhlejhhw',
+  'tkiibfwiw',
   'tklkaixiw',
   'uiuidc2jw',
 ];
@@ -28,17 +28,12 @@ function createMesh(fbxPath: string, texturePath: string, position: Position) {
     fbxLoader.load(
       fbxPath,
       (loadedModel: THREE.Group) => {
-        console.log('-----loadedModel', loadedModel);
         const mesh: any = loadedModel.children[0].clone();
         mesh.scale.set(0.1, 0.1, 0.1);
-        mesh.geometry.setAttribute(
-          'uv2',
-          new THREE.BufferAttribute(mesh.geometry.attributes.uv.array, 2),
-        );
         mesh.material.map = textureAlbedo;
-
         const vector = new THREE.Vector3(position.x, position.y, position.z);
         mesh.position.set(vector.x, vector.y, vector.z);
+
         resolve(mesh);
       },
       (xhr: ProgressEvent<EventTarget>) => {
@@ -54,11 +49,11 @@ function createMesh(fbxPath: string, texturePath: string, position: Position) {
 
 function createPhysicsBox(position: Position) {
   // Sphere参数为球体的半径
-  const sphereShape = new CANNON.Sphere(1);
+  const sphereShape = new CANNON.Box(new CANNON.Vec3(1, 1, 1));
   const defaultMaterial = new CANNON.Material('default');
   const sphereBody = new CANNON.Body({
     // 刚体的质量mass，质量为0的物体为静止的物体
-    mass: 1,
+    mass: Math.random() * 5,
     position: new CANNON.Vec3(position.x, position.y, position.z),
     shape: sphereShape,
     material: defaultMaterial,
@@ -73,9 +68,9 @@ export default async function getPhysicsModels() {
     const fbxName = `/scene-resource/fbx/${modelName[i]}_LOD4.fbx`;
     const imgName = `/scene-resource/image/${modelName[i]}_2K_Albedo.jpg`;
     const position = {
-      x: (Math.random() - 0.5) * 10,
-      y: (Math.random() - 0.5) * 10,
-      z: (Math.random() - 0.5) * 10,
+      x: (Math.random() - 0.5) * 30,
+      y: 2,
+      z: 5,
     };
     meshPromises.push(createMesh(fbxName, imgName, position));
     physicsBoxes.push(createPhysicsBox(position));
