@@ -100,7 +100,7 @@ class ModelAnimate {
     let riggedRightHand!: Kalidokit.THand<Kalidokit.Side>;
     let riggedFace!: Kalidokit.TFace;
     const rigRotation = this.rigRotation.bind(this);
-    const rigPosition = this.rigPosition.bind(this);
+    // const rigPosition = this.rigPosition.bind(this);
     const { faceLandmarks } = results;
     // Pose 3D Landmarks are with respect to Hip distance in meters
     const pose3DLandmarks = results.ea;
@@ -125,17 +125,17 @@ class ModelAnimate {
         runtime: 'mediapipe',
         video: this.videoElement,
       }) as Kalidokit.TPose;
-      rigRotation('Hips', riggedPose.Hips.rotation, 0.7);
-      rigPosition(
-        'Hips',
-        {
-          x: -riggedPose.Hips.position.x, // Reverse direction
-          y: riggedPose.Hips.position.y + 1, // Add a bit of height
-          z: -riggedPose.Hips.position.z, // Reverse direction
-        },
-        1,
-        1,
-      );
+      // rigRotation('Hips', riggedPose.Hips.rotation, 0.7);
+      // rigPosition(
+      //   'Hips',
+      //   {
+      //     x: -riggedPose.Hips.position.x, // Reverse direction
+      //     y: riggedPose.Hips.position.y + 1, // Add a bit of height
+      //     z: -riggedPose.Hips.position.z, // Reverse direction
+      //   },
+      //   1,
+      //   1,
+      // );
 
       rigRotation('Chest', riggedPose.Spine, 0.25, 0.3);
       rigRotation('Spine', riggedPose.Spine, 0.45, 0.3);
@@ -144,10 +144,10 @@ class ModelAnimate {
       rigRotation('LeftUpperArm', riggedPose.LeftUpperArm, 1, 1);
       rigRotation('LeftLowerArm', riggedPose.LeftLowerArm, 1, 1);
 
-      rigRotation('LeftUpperLeg', riggedPose.LeftUpperLeg, 1, 1);
-      rigRotation('LeftLowerLeg', riggedPose.LeftLowerLeg, 1, 1);
-      rigRotation('RightUpperLeg', riggedPose.RightUpperLeg, 1, 1);
-      rigRotation('RightLowerLeg', riggedPose.RightLowerLeg, 1, 1);
+      // rigRotation('LeftUpperLeg', riggedPose.LeftUpperLeg, 1, 1);
+      // rigRotation('LeftLowerLeg', riggedPose.LeftLowerLeg, 1, 1);
+      // rigRotation('RightUpperLeg', riggedPose.RightUpperLeg, 1, 1);
+      // rigRotation('RightLowerLeg', riggedPose.RightLowerLeg, 1, 1);
     }
 
     // Animate Hands

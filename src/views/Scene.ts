@@ -5,8 +5,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import CannonDebugger from 'cannon-es-debugger';
 // import * as dat from 'dat.gui';
 import holisticUtils from '../pose-detection/post-utils';
+import modelAmi from '../pose-detection/post-utils/model-animate';
 
-import getPhysicsModels from './Model';
+import getPhysicsModels, { createHandPhysicsBox } from './Model';
 
 const N = 128; // 控制音频分析器返回频率数据数量
 let analyser: THREE.AudioAnalyser; // 声明一个分析器变量
@@ -49,6 +50,12 @@ export function startGame() {
 }
 
 let isCreate = false;
+const leftHandPhysicsBox = createHandPhysicsBox({ x: 0, y: 0, z: 0 }, 0.1);
+leftHandPhysicsBox.addEventListener('collide', (e: any) => {
+  console.log(e);
+});
+console.log(leftHandPhysicsBox);
+// const rightHand = createPhysicsBox({ x: 0, y: 0, z: 0 });
 export default async function createScene() {
   if (isCreate) return;
   isCreate = true;
@@ -75,17 +82,18 @@ export default async function createScene() {
 
   // ----------------3.设置相机----------------
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-  camera.position.set(-5, 0, 0);
+  camera.position.set(-2, 0, 0);
   scene.add(camera);
 
   // ----------------4.设置灯光----------------
   // 环境光
-  const light = new THREE.AmbientLight(0xa0a0a0);
+  const light = new THREE.AmbientLight(0xffffff);
   scene.add(light);
   // 直线光
-  const lineLight = new THREE.DirectionalLight(0xffffff);
-  lineLight.position.set(-100, 10, 5);
-  scene.add(lineLight);
+  // const lineLight = new THREE.DirectionalLight(0xffffff);
+  // // lineLight.position.set(-100, 10, 5);
+  // light.position.set(1.0, 1.0, 1.0).normalize();
+  // scene.add(lineLight);
 
   // ----------------5.初始化渲染器----------------
   const renderer = new THREE.WebGLRenderer({
@@ -118,6 +126,7 @@ export default async function createScene() {
   physicsBoxes.forEach((element: CANNON.Body) => {
     world.addBody(element);
   });
+  world.addBody(leftHandPhysicsBox);
 
   // 为了防止物体一直下降影响性能，设置底部，以便物体停止运动后处于sleep状态
   const floorShape = new CANNON.Plane();
@@ -150,6 +159,7 @@ export default async function createScene() {
           //     physicsBoxes[i].position,
           //   );
           // }
+          physicsBoxes[i].position.x = -0.3;
           meshes[i].position.copy(physicsBoxes[i].position);
           meshes[i].quaternion.copy(physicsBoxes[i].quaternion);
         }
@@ -159,6 +169,15 @@ export default async function createScene() {
 
   // Debug调试物理世界刚体
   const cannonDebugger = CannonDebugger(scene, world, {});
+
+  const createHandModel = () => {
+    if (modelAmi.model) {
+      const hand = modelAmi.model.getBoneNode('LeftHand');
+      // console.log(hand?.getWorldPosition(new THREE.Vector3(0, 0, 0)));
+      return hand?.getWorldPosition(new THREE.Vector3(0, 0, 0));
+    }
+    return null;
+  };
 
   const render = () => {
     // 更新控制器
@@ -174,6 +193,11 @@ export default async function createScene() {
     cannonDebugger.update(); // Update the CannonDebugger meshes
     // 更新人物
     holisticUtils.renderModel();
+
+    const position = createHandModel();
+    if (position) {
+      leftHandPhysicsBox.position = new CANNON.Vec3(-0.3, position.y, position.z);
+    }
   };
 
   render();
