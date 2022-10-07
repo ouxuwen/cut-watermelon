@@ -1,6 +1,7 @@
 import * as THREE from 'three';
-import * as CANNON from 'cannon-es';
+import { Scene } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
+import Position from './type';
 
 const modelName = [
   'tefadiqla',
@@ -14,12 +15,6 @@ const modelName = [
   'uiuidc2jw',
 ];
 
-interface Position {
-  x: number;
-  y: number;
-  z: number;
-}
-
 function createMesh(fbxPath: string, texturePath: string, position: Position) {
   const fbxLoader = new FBXLoader();
   const textureAlbedo = new THREE.TextureLoader().load(texturePath);
@@ -29,7 +24,7 @@ function createMesh(fbxPath: string, texturePath: string, position: Position) {
       fbxPath,
       (loadedModel: THREE.Group) => {
         const mesh: any = loadedModel.children[0].clone();
-        mesh.scale.set(0.01, 0.01, 0.01);
+        mesh.scale.set(0.015, 0.015, 0.015);
         mesh.material.map = textureAlbedo;
         const vector = new THREE.Vector3(position.x, position.y, position.z);
         mesh.position.set(vector.x, vector.y, vector.z);
@@ -46,51 +41,41 @@ function createMesh(fbxPath: string, texturePath: string, position: Position) {
     );
   });
 }
+class FruitModel {
+  meshes: any[];
 
-export function createPhysicsBox(position: Position) {
-  // Sphere参数为球体的半径
-  const sphereShape = new CANNON.Box(new CANNON.Vec3(0.05, 0.05, 0.05));
-  const defaultMaterial = new CANNON.Material('default');
-  const sphereBody = new CANNON.Body({
-    // 刚体的质量mass，质量为0的物体为静止的物体
-    // mass: Math.random() * 5,
-    mass: 1,
-    position: new CANNON.Vec3(position.x, position.y, position.z),
-    shape: sphereShape,
-    material: defaultMaterial,
-  });
-  return sphereBody;
-}
+  scene!: Scene;
 
-export function createHandPhysicsBox(position: Position, r = 0.05) {
-  // Sphere参数为球体的半径
-  const sphereShape = new CANNON.Box(new CANNON.Vec3(r, r, r));
-  const defaultMaterial = new CANNON.Material('default');
-  const sphereBody = new CANNON.Body({
-    // 刚体的质量mass，质量为0的物体为静止的物体
-    // mass: Math.random() * 5,
-    mass: 2,
-    position: new CANNON.Vec3(position.x, position.y, position.z),
-    shape: sphereShape,
-    material: defaultMaterial,
-  });
-  return sphereBody;
-}
-
-export default async function getPhysicsModels() {
-  const meshPromises = [];
-  const physicsBoxes: CANNON.Body[] = [];
-  for (let i = 0; i < modelName.length; i++) {
-    const fbxName = `/scene-resource/fbx/${modelName[i]}_LOD4.fbx`;
-    const imgName = `/scene-resource/image/${modelName[i]}_2K_Albedo.jpg`;
-    const position = {
-      x: -0.3,
-      y: 0,
-      z: (Math.random() - 0.5) * 2,
-    };
-    meshPromises.push(createMesh(fbxName, imgName, position));
-    physicsBoxes.push(createPhysicsBox(position));
+  constructor() {
+    this.meshes = [];
   }
-  const meshes: any[] = await Promise.all(meshPromises);
-  return { meshes, physicsBoxes };
+
+  setScene(scene: Scene) {
+    this.scene = scene;
+  }
+
+  getFruitModel() {
+    const fruit = this.meshes[Math.round(Math.random() * 8)];
+    const cloneFruit = fruit.clone();
+    this.scene.add(cloneFruit);
+    return cloneFruit;
+  }
+
+  async initFruitModels() {
+    const meshPromises = [];
+    for (let i = 0; i < modelName.length; i++) {
+      const fbxName = `/scene-resource/fbx/${modelName[i]}_LOD4.fbx`;
+      const imgName = `/scene-resource/image/${modelName[i]}_2K_Albedo.jpg`;
+      const position = {
+        x: -0.3,
+        y: -1,
+        z: (Math.random() - 0.5) * 2,
+      };
+      meshPromises.push(createMesh(fbxName, imgName, position));
+    }
+    const meshes: any[] = await Promise.all(meshPromises);
+    this.meshes = meshes;
+  }
 }
+
+export default new FruitModel();
