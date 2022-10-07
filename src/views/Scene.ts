@@ -51,9 +51,9 @@ export function startGame() {
 
 let isCreate = false;
 const leftHandPhysicsBox = createHandPhysicsBox({ x: 0, y: 0, z: 0 }, 0.1);
-leftHandPhysicsBox.addEventListener('collide', (e: any) => {
-  console.log(e);
-});
+// leftHandPhysicsBox.addEventListener('collide', (e: any) => {
+//   console.log(e);
+// });
 console.log(leftHandPhysicsBox);
 // const rightHand = createPhysicsBox({ x: 0, y: 0, z: 0 });
 export default async function createScene() {

@@ -22,7 +22,10 @@ export class HolisticUtils {
 
   private clock!: THREE.Clock;
 
+  private isStart: boolean;
+
   constructor() {
+    this.isStart = false;
     this.holistic = new Holistic({
       locateFile: (file: string) => `/holistic/${file}`
       //  return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
@@ -62,7 +65,9 @@ export class HolisticUtils {
     });
   }
 
-  start() {
+  async start() {
+    if (this.isStart) return;
+    this.isStart = true;
     //  使用 `Mediapipe` 工具来获取相机 -较低的分辨率 = 较高的 fps
     const camera = new Camera(this.videoEle, {
       onFrame: async () => {
@@ -71,7 +76,7 @@ export class HolisticUtils {
       width: 640,
       height: 480,
     });
-    camera.start();
+    await camera.start();
   }
 
   createThreeSence() {
