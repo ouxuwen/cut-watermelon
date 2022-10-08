@@ -1,4 +1,9 @@
-import { FACEMESH_TESSELATION, HAND_CONNECTIONS, Holistic, POSE_CONNECTIONS } from '@mediapipe/holistic';
+import {
+  FACEMESH_TESSELATION,
+  HAND_CONNECTIONS,
+  Holistic,
+  POSE_CONNECTIONS,
+} from '@mediapipe/holistic';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { Camera } from '@mediapipe/camera_utils';
 import * as THREE from 'three';
@@ -8,7 +13,7 @@ import VrmModel from './models/vrm-model';
 
 export interface HolisticUtilsOptions {
   canvasEle: HTMLCanvasElement;
-  videoEle: HTMLVideoElement
+  videoEle: HTMLVideoElement;
 }
 
 export class HolisticUtils {
@@ -24,12 +29,13 @@ export class HolisticUtils {
 
   private isStart: boolean;
 
+  public currentModel: any;
+
   constructor() {
     this.isStart = false;
     this.holistic = new Holistic({
-      locateFile: (file: string) => `/holistic/${file}`
+      locateFile: (file: string) => `/holistic/${file}`,
       //  return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
-      ,
     });
     this.holistic.setOptions({
       modelComplexity: 1,
@@ -56,12 +62,13 @@ export class HolisticUtils {
     // this.createThreeSence();
   }
 
-  setSence(scene: THREE.Scene) {
+  setScene(scene: THREE.Scene) {
     this.scene = scene;
     // 加载三维人物
     const vrmModel = new VrmModel();
     vrmModel.loadModel(this.scene, () => {
       modelAnimate.setModel(vrmModel);
+      this.currentModel = vrmModel;
     });
   }
 
@@ -87,7 +94,12 @@ export class HolisticUtils {
     document.body.appendChild(renderer.domElement);
 
     // camera
-    const orbitCamera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const orbitCamera = new THREE.PerspectiveCamera(
+      35,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000,
+    );
     orbitCamera.position.set(0.0, 1.4, 5);
 
     // controls

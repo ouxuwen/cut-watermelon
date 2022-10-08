@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import PostPreview from '../pose-detection/post-preview/post-preview';
-import createScene, { startGame } from './Scene';
+import createScene from './Scene';
 
 function App() {
   useEffect(() => {
@@ -21,7 +21,7 @@ function App() {
           background: '#FFFFFF',
           zIndex: 100,
         }}
-        onPointerDown={startGame}
+        onPointerDown={() => (window as any).start()}
       >
         开始
       </div>
