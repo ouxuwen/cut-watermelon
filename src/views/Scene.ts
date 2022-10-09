@@ -102,6 +102,7 @@ export default async function createScene() {
     requestAnimationFrame(render);
 
     // 更新人物
+    holisticUtils.sendData();
     holisticUtils.renderModel();
 
     const { currentModel } = holisticUtils;

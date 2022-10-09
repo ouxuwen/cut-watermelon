@@ -1,13 +1,12 @@
 import {
-  FACEMESH_TESSELATION,
-  HAND_CONNECTIONS,
-  Holistic,
+  Pose,
   POSE_CONNECTIONS,
-} from '@mediapipe/holistic';
+} from '@mediapipe/pose';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { Camera } from '@mediapipe/camera_utils';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+
 import modelAnimate from './model-animate';
 import VrmModel from './models/vrm-model';
 
@@ -31,18 +30,21 @@ export class HolisticUtils {
 
   public currentModel: any;
 
+  public isPlaying: boolean;
+
   constructor() {
     this.isStart = false;
-    this.holistic = new Holistic({
-      locateFile: (file: string) => `/holistic/${file}`,
-      //  return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
+    this.isPlaying = false;
+    this.holistic = new Pose({
+      locateFile: (file: string) => `/pose/${file}`,
+      // `/pose/${file}`,
+      // return  `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1635988162/${file}`;
     });
     this.holistic.setOptions({
       modelComplexity: 1,
       smoothLandmarks: true,
       minDetectionConfidence: 0.7,
       minTrackingConfidence: 0.7,
-      refineFaceLandmarks: true,
     });
     // 通过整体回调函数
     this.holistic.onResults(this.onResults.bind(this));
@@ -84,6 +86,35 @@ export class HolisticUtils {
       height: 480,
     });
     await camera.start();
+  }
+
+  startCamera() {
+    if (this.isStart) return;
+    this.isStart = true;
+    const constraints = {
+      audio: false,
+      video: { width: 320, height: 240 },
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints)
+      .then((mediaStream) => {
+        this.videoEle.srcObject = mediaStream;
+        this.videoEle.onloadedmetadata = async () => {
+          await this.holistic.initialize();
+          this.isPlaying = true;
+          this.videoEle.play();
+        };
+      })
+      .catch((err) => {
+        // always check for errors at the end.
+        console.error(`${err.name}: ${err.message}`);
+      });
+  }
+
+  sendData() {
+    if (this.isPlaying) {
+      this.holistic.send({ image: this.videoEle });
+    }
   }
 
   createThreeSence() {
@@ -136,6 +167,7 @@ export class HolisticUtils {
   }
 
   onResults(results: any) {
+    // console.log(this.isPlaying);
     // 绘制识别结果
     this.drawResults(results);
 
@@ -158,10 +190,6 @@ export class HolisticUtils {
       color: '#ff0364',
       lineWidth: 2,
     });
-    drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION, {
-      color: '#C0C0C070',
-      lineWidth: 1,
-    });
     if (results.faceLandmarks && results.faceLandmarks.length === 478) {
       //  画地标
       drawLandmarks(canvasCtx, [results.faceLandmarks[468], results.faceLandmarks[468 + 5]], {
@@ -169,18 +197,12 @@ export class HolisticUtils {
         lineWidth: 2,
       });
     }
-    drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {
-      color: '#eb1064',
-      lineWidth: 5,
-    });
+
     drawLandmarks(canvasCtx, results.leftHandLandmarks, {
       color: '#00cff7',
       lineWidth: 2,
     });
-    drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {
-      color: '#22c3e3',
-      lineWidth: 5,
-    });
+
     drawLandmarks(canvasCtx, results.rightHandLandmarks, {
       color: '#ff0364',
       lineWidth: 2,
