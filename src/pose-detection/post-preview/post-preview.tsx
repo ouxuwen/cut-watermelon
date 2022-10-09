@@ -13,7 +13,7 @@ function PostPreview() {
       videoEle: videoRef.current as HTMLVideoElement,
       canvasEle: canvasRef.current as HTMLCanvasElement,
     });
-    holistic.start();
+    holistic.startCamera();
     return () => {};
   }, []);
 

@@ -103,7 +103,7 @@ class ModelAnimate {
     // const rigPosition = this.rigPosition.bind(this);
     const { faceLandmarks } = results;
     // Pose 3D Landmarks are with respect to Hip distance in meters
-    const pose3DLandmarks = results.ea;
+    const pose3DLandmarks = results.poseWorldLandmarks;
     // Pose 2D landmarks are with respect to videoWidth and videoHeight
     const pose2DLandmarks = results.poseLandmarks;
     // Be careful, hand landmarks may be reversed
