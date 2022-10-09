@@ -21,7 +21,10 @@ function App() {
           background: '#FFFFFF',
           zIndex: 100,
         }}
-        onPointerDown={() => (window as any).start()}
+        onPointerDown={() => {
+          (window as any).start();
+          (window as any).startGame();
+        }}
       >
         开始
       </div>

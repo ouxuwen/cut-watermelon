@@ -7,6 +7,9 @@ export interface Box extends CANNON.Body {
   isUsing: boolean;
 }
 
+const LeftHandBoxId = 10001;
+const RightHandBoxId = 10002;
+
 export class Physics {
   private world: CANNON.World;
 
@@ -59,7 +62,9 @@ export class Physics {
       this.physicsBoxs.push(box);
     }
     this.leftHandBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 1 }, 0.08, 0);
+    this.leftHandBox.id = LeftHandBoxId;
     this.rightHandBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 1 }, 0.08, 0);
+    this.rightHandBox.id = RightHandBoxId;
   }
 
   setScene(scene: Scene) {
@@ -119,6 +124,7 @@ export class Physics {
       material: defaultMaterial,
     });
     this.world.addBody(sphereBody);
+
     return sphereBody;
   }
 }

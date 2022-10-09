@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
+// import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // import * as dat from 'dat.gui';
@@ -7,10 +7,6 @@ import holisticUtils from '../pose-detection/post-utils';
 import { Control } from './control';
 import physics from './physics';
 import fruitModel from './Model';
-
-export function startGame() {
-  console.log('游戏开始');
-}
 
 let isCreate = false;
 
@@ -28,26 +24,55 @@ export default async function createScene() {
   control.setScene(scene);
 
   // 加载hdr环境贴图
-  const rgbeLoader = new RGBELoader();
-  rgbeLoader.loadAsync('/scene-resource/050.hdr').then((texture: THREE.DataTexture) => {
-    // eslint-disable-next-line no-param-reassign
-    texture.mapping = THREE.EquirectangularReflectionMapping;
-    scene.background = texture;
+  // const rgbeLoader = new RGBELoader();
+  // rgbeLoader.loadAsync('/scene-resource/050.hdr').then((texture: THREE.DataTexture) => {
+  //   // eslint-disable-next-line no-param-reassign
+  //   texture.mapping = THREE.EquirectangularReflectionMapping;
+  //   scene.background = texture;
+  // });
+
+  // 图片纹理
+  const sceneTexture = new THREE.TextureLoader().load('/scene-resource/2.jpeg');
+  sceneTexture.mapping = THREE.EquirectangularReflectionMapping;
+  scene.background = sceneTexture;
+
+  // 视频纹理
+  const texture = new THREE.TextureLoader().load('/scene-resource/2.jpeg');
+  const backgroundGeometry = new THREE.SphereGeometry(1.5);
+  const backgroundMaterial = new THREE.MeshBasicMaterial({
+    map: texture,
   });
+  backgroundGeometry.scale(1, 1, -1);
+  const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
+  scene.add(background);
+
+  const video = document.createElement('video');
+  video.src = '/scene-resource/back.mov';
+  video.loop = true;
 
   // ----------------2.初始化物品----------------
   await fruitModel.initFruitModels();
 
   (window as any).start = control.start.bind(control);
 
+  (window as any).startGame = () => {
+    console.log('游戏开始');
+    if (video.paused) {
+      video.play();
+      const textureVideo = new THREE.VideoTexture(video);
+      backgroundMaterial.map = textureVideo;
+      backgroundMaterial.map.needsUpdate = true;
+    }
+  };
+
   // ----------------3.设置相机----------------
-  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100);
   camera.position.set(-2, 0, 0);
   scene.add(camera);
 
   // ----------------4.设置灯光----------------
   // 环境光
-  const light = new THREE.AmbientLight(0xffffff);
+  const light = new THREE.AmbientLight(0xeeeeee);
   scene.add(light);
 
   // ----------------5.初始化渲染器----------------
@@ -58,6 +83,7 @@ export default async function createScene() {
   // 设置渲染的尺寸大小
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.outputEncoding = THREE.sRGBEncoding;
+  renderer.localClippingEnabled = true;
   // 创建轨道控制器
   const controls = new OrbitControls(camera, renderer.domElement);
   // 为控制器设置阻尼，让控制器有真实的效果

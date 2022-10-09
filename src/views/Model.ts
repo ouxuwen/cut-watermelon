@@ -4,15 +4,16 @@ import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import Position from './type';
 
 const modelName = [
+  'te0uchfra',
   'tefadiqla',
   'tegqfetla',
-  'tesrabopa',
   'tgmkaehpa',
   'tguocjppa',
-  'tjciddjqx',
-  'tkiibfwiw',
+  'th5jddwva',
   'tklkaixiw',
   'uiuidc2jw',
+  'ujcxeblva',
+  'veuhfhsjw',
 ];
 
 function createMesh(fbxPath: string, texturePath: string, position: Position) {
@@ -26,6 +27,7 @@ function createMesh(fbxPath: string, texturePath: string, position: Position) {
         const mesh: any = loadedModel.children[0].clone();
         mesh.scale.set(0.015, 0.015, 0.015);
         mesh.material.map = textureAlbedo;
+        mesh.material.clippingPlanes = [];
         const vector = new THREE.Vector3(position.x, position.y, position.z);
         mesh.position.set(vector.x, vector.y, vector.z);
 
@@ -55,7 +57,7 @@ class FruitModel {
   }
 
   getFruitModel() {
-    const fruit = this.meshes[Math.round(Math.random() * 8)];
+    const fruit = this.meshes[Math.round(Math.random() * (modelName.length - 1))];
     const cloneFruit = fruit.clone();
     this.scene.add(cloneFruit);
     return cloneFruit;
