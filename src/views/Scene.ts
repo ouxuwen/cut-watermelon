@@ -40,6 +40,8 @@ export default async function createScene() {
 
   (window as any).start = control.start.bind(control);
   (window as any).changeModel = holisticUtils.changeModel.bind(holisticUtils);
+  (window as any).changeToHolisticDetetor = holisticUtils.changeToHolisticDetetor.bind(holisticUtils);
+  (window as any).changeToPoseDetetor = holisticUtils.changeToPoseDetetor.bind(holisticUtils);
 
   // ----------------3.设置相机----------------
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
