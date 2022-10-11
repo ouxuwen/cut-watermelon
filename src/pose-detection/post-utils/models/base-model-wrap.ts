@@ -9,4 +9,8 @@ export interface BaseModelWrap {
   getPresetValue(name: string): number;
 
   update(num: number): void;
+
+  getOriginData(): void;
+
+  reset(): void;
 }

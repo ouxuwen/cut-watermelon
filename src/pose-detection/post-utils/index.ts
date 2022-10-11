@@ -15,6 +15,7 @@ import * as THREE from 'three';
 import modelAnimate from './model-animate';
 import VrmModelWrap from './models/vrm-model-wrap';
 import { VrmList } from './models/vrm-list';
+import { BaseModelWrap } from './models/base-model-wrap';
 
 export interface HolisticUtilsOptions {
   canvasEle: HTMLCanvasElement;
@@ -39,7 +40,7 @@ export class HolisticUtils {
 
   private isStart: boolean;
 
-  public currentModelWrap: any;
+  public currentModelWrap!: BaseModelWrap;
 
   public isPlaying: boolean;
 
@@ -80,6 +81,7 @@ export class HolisticUtils {
       // 加载三维人物到场景
       this.scene.add(currenModel.model.scene);
       modelAnimate.setModelWrap(vrmModelWrap);
+      this.currentModelWrap.getOriginData();
     }
   }
 
@@ -115,6 +117,7 @@ export class HolisticUtils {
   }
 
   async changeToPoseDetetor() {
+    this.currentModelWrap.reset();
     this.detector = null as any;
     await this.pose.initialize();
     this.detector = this.pose;
@@ -129,7 +132,7 @@ export class HolisticUtils {
   // 切换人物
   changeModel(next = true) {
     const currenModel = vrmList.changeModel(next);
-    this.scene.remove(this.currentModelWrap.model.scene);
+    this.scene.remove((this.currentModelWrap as VrmModelWrap).model.scene);
     if (currenModel.model) {
       vrmModelWrap.setModel(currenModel.model);
 

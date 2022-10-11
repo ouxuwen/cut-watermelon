@@ -59,4 +59,12 @@ export default class GlbModel implements BaseModelWrap {
   update(num: number): void {
     // this.model.update(num);
   }
+
+  getOriginData(): void {
+    // this.model.update(num);
+  }
+
+  reset(): void {
+    // this.model.update(num);
+  }
 }

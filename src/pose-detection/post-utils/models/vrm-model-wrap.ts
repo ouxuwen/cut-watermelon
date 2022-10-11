@@ -1,12 +1,24 @@
 import { VRMHumanBoneName, VRM } from '@pixiv/three-vrm';
-import { Euler, MathUtils } from 'three';
+import { Euler, MathUtils, Quaternion } from 'three';
 import { BaseModelWrap } from './base-model-wrap';
 
 export default class VrmModelWrap implements BaseModelWrap {
-  private model!: VRM;
+  public model!: VRM;
+
+  private originData: any;
 
   setModel(vrm: VRM) {
     this.model = vrm;
+  }
+
+  getOriginData() {
+    console.log(this.getBoneNode('Neck'));
+  }
+
+  reset() {
+    const euler = new Euler(0, 0, 0);
+    const quaternion = new Quaternion().setFromEuler(euler);
+    this.getBoneNode('Neck')?.quaternion.slerp(quaternion, 1);
   }
 
   getBoneNode(name: keyof typeof VRMHumanBoneName) {
