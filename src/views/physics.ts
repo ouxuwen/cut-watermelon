@@ -8,9 +8,10 @@ export interface Box extends CANNON.Body {
   isCollided: boolean;
 }
 
-const LeftHandBoxId = 10001;
-const RightHandBoxId = 10002;
-const HandBoxIdLimit = 10000;
+const LeftHandBoxId = 10011;
+const RightHandBoxId = 10012;
+const HandBoxIdLimit = 10010;
+const BombBoxId = 10000;
 
 export class Physics {
   private world: CANNON.World;
@@ -28,6 +29,10 @@ export class Physics {
   public leftHandBox: CANNON.Body;
 
   public rightHandBox: CANNON.Body;
+
+  public bombBox: any;
+
+  private bomSound = new Audio('/scene-resource/bomb.mp3');
 
   constructor() {
     this.clock = new Clock();
@@ -77,9 +82,26 @@ export class Physics {
     }
     this.leftHandBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 1 }, 0.08, 0);
     this.leftHandBox.id = LeftHandBoxId;
+    this.leftHandBox.addEventListener('collide', this.handCollided);
+
     this.rightHandBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 1 }, 0.08, 0);
     this.rightHandBox.id = RightHandBoxId;
+    this.rightHandBox.addEventListener('collide', this.handCollided);
+
+    this.bombBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 3 }, 0.08, 2);
+    this.bombBox.isUsing = false;
+    this.bombBox.isCollided = false;
+    this.bombBox.id = BombBoxId;
   }
+
+  handCollided = (e: any) => {
+    if (Math.abs(e.body.id - BombBoxId) < Number.EPSILON) {
+      this.bomSound.volume = Math.random();
+      this.bomSound.currentTime = 0;
+      this.bomSound.play();
+      this.bombBox.isCollided = true;
+    }
+  };
 
   setScene(scene: Scene) {
     this.scene = scene;

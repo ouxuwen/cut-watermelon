@@ -19,7 +19,12 @@ const modelName = [
   'veuhfhsjw',
 ];
 
-function createMesh(fbxPath: string, texturePath: string, position: Position) {
+function createMesh(
+  fbxPath: string,
+  texturePath: string,
+  position: Position,
+  scale: number = 0.015,
+) {
   const fbxLoader = new FBXLoader();
   const textureAlbedo = new THREE.TextureLoader().load(texturePath);
 
@@ -28,9 +33,9 @@ function createMesh(fbxPath: string, texturePath: string, position: Position) {
       fbxPath,
       (loadedModel: THREE.Group) => {
         const mesh: any = loadedModel.children[0].clone();
-        mesh.scale.set(0.015, 0.015, 0.015);
+        mesh.scale.set(scale, scale, scale);
         mesh.material.map = textureAlbedo;
-        mesh.material.clippingPlanes = [];
+        // mesh.material.clippingPlanes = [];
         const vector = new THREE.Vector3(position.x, position.y, position.z);
         mesh.position.set(vector.x, vector.y, vector.z);
         resolve(mesh);
@@ -76,12 +81,40 @@ export async function getCoinModel(position: Position) {
     '/scene-resource/fbx/ueilcjiva_LOD4.fbx',
     '/scene-resource/metal.jpeg',
     position,
+    0.02,
   );
   coinMesh.rotation.z = -Math.PI * 0.5;
-  coinMesh.scale.set(0.02, 0.02, 0.02);
   const textMesh: any = await createText(position);
   textMesh.rotation.y = -Math.PI * 0.5;
   return { coinMesh, textMesh };
+}
+
+export async function createBomb() {
+  const fbxLoader = new FBXLoader();
+  const textureAlbedo = new THREE.TextureLoader().load(
+    '/scene-resource/image/bombbody_BaseColor.png',
+  );
+
+  return new Promise((resolve: (value: unknown) => void) => {
+    fbxLoader.load(
+      '/scene-resource/fbx/bomb.fbx',
+      (loadedModel: any) => {
+        // eslint-disable-next-line no-param-reassign
+        loadedModel.children[1].material.map = textureAlbedo;
+        loadedModel.scale.set(0.1, 0.1, 0.1);
+        // mesh.material.clippingPlanes = [];
+        loadedModel.position.set(-0.3, -1, 0);
+        resolve(loadedModel);
+      },
+      (xhr: ProgressEvent<EventTarget>) => {
+        console.log(`${(xhr.loaded / xhr.total) * 100}% loaded`);
+      },
+      (error: ErrorEvent) => {
+        console.log('加载模型出现异常：', error);
+        resolve(null);
+      },
+    );
+  });
 }
 
 class FruitModel {
