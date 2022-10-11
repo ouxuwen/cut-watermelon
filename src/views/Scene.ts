@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 // import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
 // import * as dat from 'dat.gui';
+// import fontsStyle from 'three/examples/fonts/gentilis_bold.typeface.json';
 import holisticUtils from '../pose-detection/post-utils';
 import { Control } from './control';
 import physics from './physics';
@@ -37,31 +37,21 @@ export default async function createScene() {
   scene.background = sceneTexture;
 
   // 视频纹理
-  const texture = new THREE.TextureLoader().load('/scene-resource/2.jpeg');
-  const backgroundGeometry = new THREE.SphereGeometry(1.5);
-  const backgroundMaterial = new THREE.MeshBasicMaterial({
-    map: texture,
-  });
-  backgroundGeometry.scale(1, 1, -1);
-  const background = new THREE.Mesh(backgroundGeometry, backgroundMaterial);
-  scene.add(background);
-
   const video = document.createElement('video');
-  video.src = '/scene-resource/back.mov';
+  video.src = '/scene-resource/movie.mp4';
   video.loop = true;
 
   // ----------------2.初始化物品----------------
   await fruitModel.initFruitModels();
 
-  (window as any).start = control.start.bind(control);
+  (window as any).start = await control.start.bind(control);
 
   (window as any).startGame = () => {
     console.log('游戏开始');
     if (video.paused) {
       video.play();
       const textureVideo = new THREE.VideoTexture(video);
-      backgroundMaterial.map = textureVideo;
-      backgroundMaterial.map.needsUpdate = true;
+      scene.background = textureVideo;
     }
   };
 

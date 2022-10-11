@@ -3,9 +3,7 @@ import { Scene } from 'three';
 /* eslint-disable import/prefer-default-export */
 import * as CANNON from 'cannon-es';
 import physics from './physics';
-import fruitModel from './Model';
-
-const HandBoxIdLimit = 10000;
+import fruitModel, { getCoinModel } from './Model';
 
 export function fruitBindPhysics(fruit: any, physicsObj: any) {
   if (physics && fruit) {
@@ -25,8 +23,13 @@ export class Control {
 
   isRunning: boolean;
 
+  coinModel!: { coin: any; text: any };
+
+  coinList: { coin: any; text: any }[];
+
   constructor() {
     this.fruitList = [];
+    this.coinList = [];
     this.isRunning = false;
   }
 
@@ -34,12 +37,15 @@ export class Control {
     this.scene = scene;
   }
 
-  start() {
+  async start() {
     if (this.isRunning) return;
     this.isRunning = true;
     for (let i = 0; i < range(2, 5); i++) {
       this.createRandomFruit();
     }
+    const position = { x: 0, y: 0, z: 0 };
+    const { coinMesh, textMesh } = await getCoinModel(position);
+    this.coinModel = { coin: coinMesh, text: textMesh };
   }
 
   createRandomFruit() {
@@ -47,21 +53,6 @@ export class Control {
 
     if (physicsObj) {
       const fruit = fruitModel.getFruitModel();
-      const handleCollision = (e: any) => {
-        if (e.body.id > HandBoxIdLimit) {
-          this.reset({ fruit, physicsObj });
-          // const f1 = fruit.clone();
-          // // fruit.material.clippingPlanes.push(new Plane(new Vector3(0, 1, 0), 0));
-          // f1.material.clippingPlanes.push(new Plane(new Vector3(0, 1, 0), 0));
-          // this.scene.add(f1);
-          // f1.material.clippingPlanes.pop();
-          // 下一次事件循环再取消监听，不然会出现异常
-          setTimeout(() => {
-            e.target.removeEventListener('collide', handleCollision);
-          }, 0);
-        }
-      };
-      physicsObj.addEventListener('collide', handleCollision);
       const absZ = Math.abs(physicsObj.id - 5);
       let z = 0;
       if (physicsObj.id - 5 > 0) {
@@ -104,6 +95,29 @@ export class Control {
     if (!this.isRunning) return;
     this.fruitList = this.fruitList.filter((el) => {
       fruitBindPhysics(el.fruit, el.physicsObj);
+      if (el.physicsObj.isCollided) {
+        this.reset(el);
+        const tempCoinMesh = {
+          coin: this.coinModel.coin.clone(),
+          text: this.coinModel.text.clone(),
+        };
+
+        tempCoinMesh.coin.position.set(
+          el.fruit.position.x,
+          el.fruit.position.y,
+          el.fruit.position.z,
+        );
+        this.scene.add(tempCoinMesh.coin);
+
+        tempCoinMesh.text.position.set(
+          el.fruit.position.x,
+          el.fruit.position.y + 0.035,
+          el.fruit.position.z - 0.035,
+        );
+        this.scene.add(tempCoinMesh.text);
+        this.coinList.push(tempCoinMesh);
+        el.physicsObj.isCollided = false;
+      }
       if (el.fruit.position.y <= -1) {
         this.reset(el);
         return false;
@@ -115,6 +129,17 @@ export class Control {
       for (let i = 0; i < range(1, 4); i++) {
         this.createRandomFruit();
       }
+    }
+
+    if (this.coinList.length > 0) {
+      this.coinList.forEach((coinMesh) => {
+        coinMesh.coin.position.y += 0.01;
+        coinMesh.text.position.y += 0.01;
+        if (coinMesh.coin.position.y > 5) {
+          this.scene.remove(coinMesh.coin);
+          this.scene.remove(coinMesh.text);
+        }
+      });
     }
   }
 

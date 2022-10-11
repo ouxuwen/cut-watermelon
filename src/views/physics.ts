@@ -5,10 +5,12 @@ import Position from './type';
 
 export interface Box extends CANNON.Body {
   isUsing: boolean;
+  isCollided: boolean;
 }
 
 const LeftHandBoxId = 10001;
 const RightHandBoxId = 10002;
+const HandBoxIdLimit = 10000;
 
 export class Physics {
   private world: CANNON.World;
@@ -53,12 +55,24 @@ export class Physics {
     // this.world.addBody(floorBody);
     // // setFromAxisAngle方法第一个参数是旋转轴，第二个参数是角度，为了能够让地面平过来
     // floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
-
+    const hitSound = new Audio('/scene-resource/coin.mp3');
     this.physicsBoxs = [];
     for (let i = 0; i < 10; i++) {
       const box = this.createPhysicsBox({ x: -0.3, y: -1, z: (i - 5) * 0.2 }) as unknown as Box;
       box.isUsing = false;
+      box.isCollided = false;
       box.id = i + 1;
+      box.addEventListener('collide', (e: any) => {
+        if (e.body.id > HandBoxIdLimit) {
+          e.target.isCollided = true;
+          const impactStrength = e.contact.getImpactVelocityAlongNormal();
+          if (impactStrength > 1.5) {
+            hitSound.volume = Math.random();
+            hitSound.currentTime = 0;
+            hitSound.play();
+          }
+        }
+      });
       this.physicsBoxs.push(box);
     }
     this.leftHandBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 1 }, 0.08, 0);
