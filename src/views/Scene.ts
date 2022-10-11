@@ -39,6 +39,7 @@ export default async function createScene() {
   await fruitModel.initFruitModels();
 
   (window as any).start = control.start.bind(control);
+  (window as any).changeModel = holisticUtils.changeModel.bind(holisticUtils);
 
   // ----------------3.设置相机----------------
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
@@ -79,14 +80,14 @@ export default async function createScene() {
     holisticUtils.sendData();
     holisticUtils.renderModel();
 
-    const { currentModel } = holisticUtils;
+    const { currentModelWrap } = holisticUtils;
     let leftHandPosition;
     let rightHandPosition;
-    if (currentModel) {
-      leftHandPosition = currentModel
+    if (currentModelWrap) {
+      leftHandPosition = currentModelWrap
         .getBoneNode('LeftHand')
         ?.getWorldPosition(new THREE.Vector3(0, 0, 0));
-      rightHandPosition = currentModel
+      rightHandPosition = currentModelWrap
         .getBoneNode('RightHand')
         ?.getWorldPosition(new THREE.Vector3(0, 0, 0));
     }

@@ -10,7 +10,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import modelAnimate from './model-animate';
-import VrmModel from './models/vrm-model';
+// import VrmModel from './models/vrm-model';
 
 export interface HolisticUtilsOptions {
   canvasEle: HTMLCanvasElement;
@@ -66,15 +66,15 @@ export class HolisticUtils {
     // this.createThreeSence();
   }
 
-  setScene(scene: THREE.Scene) {
-    this.scene = scene;
-    // 加载三维人物
-    const vrmModel = new VrmModel();
-    vrmModel.loadModel(this.scene, () => {
-      modelAnimate.setModel(vrmModel);
-      this.currentModel = vrmModel;
-    });
-  }
+  // setScene(scene: THREE.Scene) {
+  //   this.scene = scene;
+  //   // 加载三维人物
+  //   const vrmModel = new VrmModel();
+  //   vrmModel.loadModel(this.scene, () => {
+  //     modelAnimate.setModel(vrmModel);
+  //     this.currentModel = vrmModel;
+  //   });
+  // }
 
   async start() {
     if (this.isStart) return;

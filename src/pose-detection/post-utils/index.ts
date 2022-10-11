@@ -8,13 +8,15 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import modelAnimate from './model-animate';
-import VrmModel from './models/vrm-model';
+import VrmModelWrap from './models/vrm-model-wrap';
+import { VrmList } from './models/vrm-list';
 
 export interface HolisticUtilsOptions {
   canvasEle: HTMLCanvasElement;
   videoEle: HTMLVideoElement;
 }
-
+const vrmList = new VrmList();
+const vrmModelWrap = new VrmModelWrap();
 export class HolisticUtils {
   private holistic;
 
@@ -28,7 +30,7 @@ export class HolisticUtils {
 
   private isStart: boolean;
 
-  public currentModel: any;
+  public currentModelWrap: any;
 
   public isPlaying: boolean;
 
@@ -64,14 +66,31 @@ export class HolisticUtils {
     // this.createThreeSence();
   }
 
-  setScene(scene: THREE.Scene) {
+  async setScene(scene: THREE.Scene) {
     this.scene = scene;
     // 加载三维人物
-    const vrmModel = new VrmModel();
-    vrmModel.loadModel(this.scene, () => {
-      modelAnimate.setModel(vrmModel);
-      this.currentModel = vrmModel;
-    });
+
+    await vrmList.loadAllModel();
+    const currenModel = vrmList.getCurrentModel();
+    if (currenModel.model) {
+      this.currentModelWrap = vrmModelWrap;
+      vrmModelWrap.setModel(currenModel.model);
+      // 加载三维人物到场景
+      this.scene.add(currenModel.model.scene);
+      modelAnimate.setModel(vrmModelWrap);
+    }
+  }
+
+  // 切换人物
+  changeModel(next = true) {
+    const currenModel = vrmList.changeModel(next);
+    this.scene.remove(this.currentModelWrap.model.scene);
+    if (currenModel.model) {
+      vrmModelWrap.setModel(currenModel.model);
+
+      // 加载三维人物到场景
+      this.scene.add(currenModel.model.scene);
+    }
   }
 
   async start() {
