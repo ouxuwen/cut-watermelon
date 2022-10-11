@@ -2,7 +2,7 @@
 import * as Kalidokit from 'kalidokit';
 import * as THREE from 'three';
 import { VRMExpressionPresetName, VRMHumanBoneName } from '@pixiv/three-vrm';
-import { BaseModel } from './models/base-model';
+import { BaseModelWrap } from './models/base-model-wrap';
 
 // const { remap } = Kalidokit.Utils;
 const { clamp } = Kalidokit.Utils;
@@ -11,10 +11,10 @@ const { lerp } = Kalidokit.Vector;
 class ModelAnimate {
   private videoElement!: HTMLVideoElement;
 
-  public model!: BaseModel;
+  public modelWrap!: BaseModelWrap;
 
-  setModel(model: BaseModel) {
-    this.model = model;
+  setModelWrap(modelWrap: BaseModelWrap) {
+    this.modelWrap = modelWrap;
   }
 
   setVideoEle(videoElement: HTMLVideoElement) {
@@ -23,10 +23,10 @@ class ModelAnimate {
 
   // 位置动作
   rigPosition(name: keyof typeof VRMHumanBoneName, position = { x: 0, y: 0, z: 0 }, dampener = 1, lerpAmount = 0.3) {
-    if (!this.model) {
+    if (!this.modelWrap) {
       return;
     }
-    const Part = this.model.getBoneNode(name);
+    const Part = this.modelWrap.getBoneNode(name);
     if (!Part) {
       return;
     }
@@ -37,11 +37,11 @@ class ModelAnimate {
 
   // 肢体旋转
   rigRotation(name: keyof typeof VRMHumanBoneName, rotation = { x: 0, y: 0, z: 0 }, dampener = 1, lerpAmount = 0.3) {
-    if (!this.model) {
+    if (!this.modelWrap) {
       return;
     }
 
-    const Part = this.model.getBoneNode(name);
+    const Part = this.modelWrap.getBoneNode(name);
 
     if (!Part) {
       return;
@@ -52,7 +52,7 @@ class ModelAnimate {
   }
 
   rigFace(riggedFace: Kalidokit.TFace) {
-    if (!this.model) {
+    if (!this.modelWrap) {
       return;
     }
     const oldLookTarget = new THREE.Euler();
@@ -60,8 +60,8 @@ class ModelAnimate {
     rigRotation('Neck', riggedFace.head, 0.7);
 
     // 混合动作 预设名
-    const setValue = this.model.setPresetValue;
-    const getValue = this.model.getPresetValue;
+    const setValue = this.modelWrap.setPresetValue;
+    const getValue = this.modelWrap.getPresetValue;
     const PresetName = VRMExpressionPresetName;
 
     // 没有眨眼的简单示例。根据旧的混合形状插值，然后使用“Kalidokit”辅助功能稳定闪烁。
@@ -87,11 +87,11 @@ class ModelAnimate {
       'XYZ',
     );
     oldLookTarget.copy(lookTarget);
-    this.model.lookAt(lookTarget);
+    this.modelWrap.lookAt(lookTarget);
   }
 
   run(results: any) {
-    if (!this.model) {
+    if (!this.modelWrap) {
       return;
     }
     // 从“整体”中获取结果，并基于角色的“面”、“姿势”和“手关键点”设置角色动画。

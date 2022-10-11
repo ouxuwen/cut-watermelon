@@ -1,8 +1,8 @@
 import { VRMHumanBoneName, VRM } from '@pixiv/three-vrm';
 import { Euler, MathUtils } from 'three';
-import { BaseModel } from './base-model';
+import { BaseModelWrap } from './base-model-wrap';
 
-export default class VrmModelWrap implements BaseModel {
+export default class VrmModelWrap implements BaseModelWrap {
   private model!: VRM;
 
   setModel(vrm: VRM) {

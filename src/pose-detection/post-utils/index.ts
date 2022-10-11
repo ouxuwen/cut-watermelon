@@ -79,7 +79,7 @@ export class HolisticUtils {
       vrmModelWrap.setModel(currenModel.model);
       // 加载三维人物到场景
       this.scene.add(currenModel.model.scene);
-      modelAnimate.setModel(vrmModelWrap);
+      modelAnimate.setModelWrap(vrmModelWrap);
     }
   }
 
@@ -224,9 +224,9 @@ export class HolisticUtils {
   // }
 
   renderModel() {
-    if (modelAnimate.model) {
+    if (modelAnimate.modelWrap) {
       // 更新模型
-      modelAnimate.model.update(this.clock.getDelta());
+      modelAnimate.modelWrap.update(this.clock.getDelta());
     }
   }
 

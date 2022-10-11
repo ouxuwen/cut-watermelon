@@ -4,9 +4,9 @@ import { VRMHumanBoneName } from '@pixiv/three-vrm';
 import { Euler, Group, HemisphereLight, Scene } from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import mixamo from '../helpers/mixamo';
-import { BaseModel } from './base-model';
+import { BaseModelWrap } from './base-model-wrap';
 
-export default class GlbModel implements BaseModel {
+export default class GlbModel implements BaseModelWrap {
   private model!: Group;
 
   loadModel(scene: Scene, callback:() => void) {
