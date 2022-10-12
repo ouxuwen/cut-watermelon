@@ -51,6 +51,7 @@ export default async function createScene() {
   (window as any).changeToPoseDetetor = holisticUtils.changeToPoseDetetor.bind(holisticUtils);
 
   (window as any).startGame = () => {
+    holisticUtils.changeToPoseDetetor();
     console.log('游戏开始');
     if (video.paused) {
       video.play();

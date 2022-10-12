@@ -14,7 +14,8 @@ module.exports = {
     'no-plusplus': 'off',
     'no-console': 'off',
     'object-curly-newline': 'off',
-    'max-len': ['error', { code: 150 }],
+    'max-len': ['error', { code: 250 }],
+    'operator-linebreak': 'warn',
   },
   parserOptions: {
     ecmaVersion: 2020,
