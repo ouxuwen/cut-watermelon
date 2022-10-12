@@ -2,21 +2,33 @@ import {
   Pose,
   POSE_CONNECTIONS,
 } from '@mediapipe/pose';
+
+import {
+  FACEMESH_TESSELATION,
+  HAND_CONNECTIONS,
+  Holistic,
+} from '@mediapipe/holistic';
 import { drawConnectors, drawLandmarks } from '@mediapipe/drawing_utils';
 import { Camera } from '@mediapipe/camera_utils';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 import modelAnimate from './model-animate';
-import VrmModel from './models/vrm-model';
+import VrmModelWrap from './models/vrm-model-wrap';
+import { VrmList } from './models/vrm-list';
+import { BaseModelWrap } from './models/base-model-wrap';
 
 export interface HolisticUtilsOptions {
   canvasEle: HTMLCanvasElement;
   videoEle: HTMLVideoElement;
 }
-
+const vrmList = new VrmList();
+const vrmModelWrap = new VrmModelWrap();
 export class HolisticUtils {
-  private holistic;
+  private holistic!: Holistic;
+
+  private pose!: Pose;
+
+  private detector: Pose | Holistic;
 
   private videoEle!: HTMLVideoElement;
 
@@ -28,26 +40,19 @@ export class HolisticUtils {
 
   private isStart: boolean;
 
-  public currentModel: any;
+  public currentModelWrap!: BaseModelWrap;
 
   public isPlaying: boolean;
 
   constructor() {
     this.isStart = false;
     this.isPlaying = false;
-    this.holistic = new Pose({
-      locateFile: (file: string) => `/pose/${file}`,
-      // `/pose/${file}`,
-      // return  `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1635988162/${file}`;
-    });
-    this.holistic.setOptions({
-      modelComplexity: 1,
-      smoothLandmarks: true,
-      minDetectionConfidence: 0.7,
-      minTrackingConfidence: 0.7,
-    });
-    // 通过整体回调函数
-    this.holistic.onResults(this.onResults.bind(this));
+    // 初始化肢体检测模型
+    this.initPoseDetetor();
+    // 初始化全身检测模型
+    this.initHolisticDetetor();
+
+    this.detector = this.holistic;
 
     // Main Render Loop
     this.clock = new THREE.Clock();
@@ -64,14 +69,76 @@ export class HolisticUtils {
     // this.createThreeSence();
   }
 
-  setScene(scene: THREE.Scene) {
+  async setScene(scene: THREE.Scene) {
     this.scene = scene;
     // 加载三维人物
-    const vrmModel = new VrmModel();
-    vrmModel.loadModel(this.scene, () => {
-      modelAnimate.setModel(vrmModel);
-      this.currentModel = vrmModel;
+
+    await vrmList.loadAllModel();
+    const currenModel = vrmList.getCurrentModel();
+    if (currenModel.model) {
+      this.currentModelWrap = vrmModelWrap;
+      vrmModelWrap.setModel(currenModel.model);
+      // 加载三维人物到场景
+      this.scene.add(currenModel.model.scene);
+      modelAnimate.setModelWrap(vrmModelWrap);
+      this.currentModelWrap.getOriginData();
+    }
+  }
+
+  initPoseDetetor() {
+    this.pose = new Pose({
+      locateFile: (file: string) => `/pose/${file}`,
+      // return  `https://cdn.jsdelivr.net/npm/@mediapipe/pose@0.5.1635988162/${file}`;
     });
+    this.pose.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      minDetectionConfidence: 0.7,
+      minTrackingConfidence: 0.7,
+    });
+    // 通过整体回调函数
+    this.pose.onResults(this.onResults.bind(this));
+  }
+
+  initHolisticDetetor() {
+    this.holistic = new Holistic({
+      locateFile: (file: string) => `/holistic/${file}`,
+      //  return `https://cdn.jsdelivr.net/npm/@mediapipe/holistic@0.5.1635989137/${file}`;
+    });
+    this.holistic.setOptions({
+      modelComplexity: 1,
+      smoothLandmarks: true,
+      minDetectionConfidence: 0.7,
+      minTrackingConfidence: 0.7,
+      refineFaceLandmarks: true,
+    });
+    // 通过整体回调函数
+    this.holistic.onResults(this.onResults.bind(this));
+  }
+
+  async changeToPoseDetetor() {
+    this.currentModelWrap.reset();
+    this.detector = null as any;
+    await this.pose.initialize();
+    this.detector = this.pose;
+  }
+
+  async changeToHolisticDetetor() {
+    this.detector = null as any;
+    await this.pose.initialize();
+    this.detector = this.holistic;
+  }
+
+  // 切换人物
+  changeModel(next = true) {
+    const currenModel = vrmList.changeModel(next);
+    this.scene.remove((this.currentModelWrap as VrmModelWrap).model.scene);
+    if (currenModel.model) {
+      vrmModelWrap.setModel(currenModel.model);
+
+      // 加载三维人物到场景
+      this.scene.add(currenModel.model.scene);
+    }
   }
 
   async start() {
@@ -80,7 +147,7 @@ export class HolisticUtils {
     //  使用 `Mediapipe` 工具来获取相机 -较低的分辨率 = 较高的 fps
     const camera = new Camera(this.videoEle, {
       onFrame: async () => {
-        await this.holistic.send({ image: this.videoEle });
+        await this.pose.send({ image: this.videoEle });
       },
       width: 640,
       height: 480,
@@ -100,7 +167,7 @@ export class HolisticUtils {
       .then((mediaStream) => {
         this.videoEle.srcObject = mediaStream;
         this.videoEle.onloadedmetadata = async () => {
-          await this.holistic.initialize();
+          await this.detector.initialize();
           this.isPlaying = true;
           this.videoEle.play();
         };
@@ -112,57 +179,57 @@ export class HolisticUtils {
   }
 
   sendData() {
-    if (this.isPlaying) {
-      this.holistic.send({ image: this.videoEle });
+    if (this.isPlaying && this.detector) {
+      this.detector.send({ image: this.videoEle });
     }
   }
 
-  createThreeSence() {
-    // renderer
-    const renderer = new THREE.WebGLRenderer({ alpha: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    document.body.appendChild(renderer.domElement);
+  // createThreeSence() {
+  //   // renderer
+  //   const renderer = new THREE.WebGLRenderer({ alpha: true });
+  //   renderer.setSize(window.innerWidth, window.innerHeight);
+  //   renderer.setPixelRatio(window.devicePixelRatio);
+  //   document.body.appendChild(renderer.domElement);
 
-    // camera
-    const orbitCamera = new THREE.PerspectiveCamera(
-      35,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000,
-    );
-    orbitCamera.position.set(0.0, 1.4, 5);
+  //   // camera
+  //   const orbitCamera = new THREE.PerspectiveCamera(
+  //     35,
+  //     window.innerWidth / window.innerHeight,
+  //     0.1,
+  //     1000,
+  //   );
+  //   orbitCamera.position.set(0.0, 1.4, 5);
 
-    // controls
-    const orbitControls = new OrbitControls(orbitCamera, renderer.domElement);
-    orbitControls.screenSpacePanning = true;
-    orbitControls.target.set(0.0, 1.4, 0.0);
-    orbitControls.update();
+  //   // controls
+  //   const orbitControls = new OrbitControls(orbitCamera, renderer.domElement);
+  //   orbitControls.screenSpacePanning = true;
+  //   orbitControls.target.set(0.0, 1.4, 0.0);
+  //   orbitControls.update();
 
-    // scene
-    this.scene = new THREE.Scene();
+  //   // scene
+  //   this.scene = new THREE.Scene();
 
-    // light
-    const light = new THREE.DirectionalLight(0xffffff);
-    light.position.set(1.0, 1.0, 1.0).normalize();
-    this.scene.add(light);
+  //   // light
+  //   const light = new THREE.DirectionalLight(0xffffff);
+  //   light.position.set(1.0, 1.0, 1.0).normalize();
+  //   this.scene.add(light);
 
-    const animate = () => {
-      requestAnimationFrame(animate);
+  //   const animate = () => {
+  //     requestAnimationFrame(animate);
 
-      if (modelAnimate.model) {
-        // 更新模型
-        modelAnimate.model.update(this.clock.getDelta());
-      }
-      renderer.render(this.scene, orbitCamera);
-    };
-    animate();
-  }
+  //     if (modelAnimate.model) {
+  //       // 更新模型
+  //       modelAnimate.model.update(this.clock.getDelta());
+  //     }
+  //     renderer.render(this.scene, orbitCamera);
+  //   };
+  //   animate();
+  // }
 
   renderModel() {
-    if (modelAnimate.model) {
+    if (modelAnimate.modelWrap) {
       // 更新模型
-      modelAnimate.model.update(this.clock.getDelta());
+      modelAnimate.modelWrap.update(this.clock.getDelta());
     }
   }
 
@@ -207,6 +274,22 @@ export class HolisticUtils {
       color: '#ff0364',
       lineWidth: 2,
     });
+
+    /* * 以下是全量检测才会有 * */
+    if (this.detector instanceof Holistic) {
+      drawConnectors(canvasCtx, results.faceLandmarks, FACEMESH_TESSELATION, {
+        color: '#C0C0C070',
+        lineWidth: 1,
+      });
+      drawConnectors(canvasCtx, results.leftHandLandmarks, HAND_CONNECTIONS, {
+        color: '#eb1064',
+        lineWidth: 5,
+      });
+      drawConnectors(canvasCtx, results.rightHandLandmarks, HAND_CONNECTIONS, {
+        color: '#22c3e3',
+        lineWidth: 5,
+      });
+    }
   }
 }
 

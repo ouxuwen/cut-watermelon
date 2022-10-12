@@ -45,6 +45,10 @@ export default async function createScene() {
   await fruitModel.initFruitModels();
 
   (window as any).start = await control.start.bind(control);
+  (window as any).changeModel = holisticUtils.changeModel.bind(holisticUtils);
+  (window as any).changeToHolisticDetetor =
+    holisticUtils.changeToHolisticDetetor.bind(holisticUtils);
+  (window as any).changeToPoseDetetor = holisticUtils.changeToPoseDetetor.bind(holisticUtils);
 
   (window as any).startGame = () => {
     console.log('游戏开始');
@@ -95,14 +99,14 @@ export default async function createScene() {
     holisticUtils.sendData();
     holisticUtils.renderModel();
 
-    const { currentModel } = holisticUtils;
+    const { currentModelWrap } = holisticUtils;
     let leftHandPosition;
     let rightHandPosition;
-    if (currentModel) {
-      leftHandPosition = currentModel
+    if (currentModelWrap) {
+      leftHandPosition = currentModelWrap
         .getBoneNode('LeftHand')
         ?.getWorldPosition(new THREE.Vector3(0, 0, 0));
-      rightHandPosition = currentModel
+      rightHandPosition = currentModelWrap
         .getBoneNode('RightHand')
         ?.getWorldPosition(new THREE.Vector3(0, 0, 0));
     }
