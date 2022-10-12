@@ -38,7 +38,7 @@ export default async function createScene() {
 
   // 视频纹理
   const video = document.createElement('video');
-  video.src = '/scene-resource/movie.mp4';
+  video.src = '/scene-resource/back-movie.mp4';
   video.loop = true;
 
   // ----------------2.初始化物品----------------
