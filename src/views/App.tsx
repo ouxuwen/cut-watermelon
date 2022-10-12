@@ -21,9 +21,9 @@ function App() {
           background: '#FFFFFF',
           zIndex: 100,
         }}
-        onPointerDown={() => {
+        onPointerDown={async () => {
+          await (window as any).startGame();
           (window as any).start();
-          (window as any).startGame();
         }}
       >
         开始

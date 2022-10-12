@@ -38,15 +38,24 @@ export class HolisticUtils {
 
   private clock!: THREE.Clock;
 
-  private isStart: boolean;
+  private isInit: boolean;
 
   public currentModelWrap!: BaseModelWrap;
 
-  public isPlaying: boolean;
+  public isCameraReady: boolean;
+
+  public isGameStarting: boolean;
+
+  public preRightHandPosition:THREE.Vector3 | undefined;
+
+  public preLeftHandPosition:THREE.Vector3 | undefined;
+
+  private preChangeTime: number;
 
   constructor() {
-    this.isStart = false;
-    this.isPlaying = false;
+    this.isInit = false;
+    this.isCameraReady = false;
+    this.isGameStarting = false;
     // 初始化肢体检测模型
     this.initPoseDetetor();
     // 初始化全身检测模型
@@ -56,6 +65,8 @@ export class HolisticUtils {
 
     // Main Render Loop
     this.clock = new THREE.Clock();
+
+    this.preChangeTime = new Date().getTime();
   }
 
   init({ canvasEle, videoEle }: HolisticUtilsOptions) {
@@ -67,6 +78,14 @@ export class HolisticUtils {
 
     // 创建Three
     // this.createThreeSence();
+  }
+
+  setGameStatus(bool: boolean) {
+    this.isGameStarting = bool;
+    if (bool) {
+      this.preLeftHandPosition = undefined;
+      this.preRightHandPosition = undefined;
+    }
   }
 
   async setScene(scene: THREE.Scene) {
@@ -131,6 +150,8 @@ export class HolisticUtils {
 
   // 切换人物
   changeModel(next = true) {
+    if (new Date().getTime() - this.preChangeTime < 1500) return;
+    console.log('change Model');
     const currenModel = vrmList.changeModel(next);
     this.scene.remove((this.currentModelWrap as VrmModelWrap).model.scene);
     if (currenModel.model) {
@@ -139,11 +160,12 @@ export class HolisticUtils {
       // 加载三维人物到场景
       this.scene.add(currenModel.model.scene);
     }
+    this.preChangeTime = new Date().getTime();
   }
 
   async start() {
-    if (this.isStart) return;
-    this.isStart = true;
+    if (this.isInit) return;
+    this.isInit = true;
     //  使用 `Mediapipe` 工具来获取相机 -较低的分辨率 = 较高的 fps
     const camera = new Camera(this.videoEle, {
       onFrame: async () => {
@@ -156,8 +178,8 @@ export class HolisticUtils {
   }
 
   startCamera() {
-    if (this.isStart) return;
-    this.isStart = true;
+    if (this.isInit) return;
+    this.isInit = true;
     const constraints = {
       audio: false,
       video: { width: 320, height: 240 },
@@ -168,7 +190,7 @@ export class HolisticUtils {
         this.videoEle.srcObject = mediaStream;
         this.videoEle.onloadedmetadata = async () => {
           await this.detector.initialize();
-          this.isPlaying = true;
+          this.isCameraReady = true;
           this.videoEle.play();
         };
       })
@@ -179,7 +201,7 @@ export class HolisticUtils {
   }
 
   sendData() {
-    if (this.isPlaying && this.detector) {
+    if (this.isCameraReady && this.detector) {
       this.detector.send({ image: this.videoEle });
     }
   }
@@ -230,11 +252,37 @@ export class HolisticUtils {
     if (modelAnimate.modelWrap) {
       // 更新模型
       modelAnimate.modelWrap.update(this.clock.getDelta());
+
+      if (!this.isGameStarting) {
+        const rightHand = this.currentModelWrap.getBoneNode('RightHand')?.getWorldPosition(new THREE.Vector3(0, 0, 0));
+        const leftHand = this.currentModelWrap.getBoneNode('LeftHand')?.getWorldPosition(new THREE.Vector3(0, 0, 0));
+        // console.log(rightHand, leftHand);
+        const currentRightHandPosition = rightHand;
+        const currentLeftHandPosition = leftHand;
+        const { preRightHandPosition, preLeftHandPosition } = this;
+        if ((currentRightHandPosition && preRightHandPosition) && (currentRightHandPosition?.y > 0 && preRightHandPosition?.y > 0)) {
+          // eslint-disable-next-line no-unsafe-optional-chaining
+          if ((currentRightHandPosition?.z - preRightHandPosition?.z) > 0.12) {
+            console.log('右手右滑');
+            this.changeModel(true);
+          }
+        }
+
+        if ((currentLeftHandPosition && preLeftHandPosition) && (currentLeftHandPosition?.y > 0 && preLeftHandPosition?.y > 0)) {
+          // eslint-disable-next-line no-unsafe-optional-chaining
+          if (currentLeftHandPosition?.z - preLeftHandPosition?.z < -0.12) {
+            console.log('左手左滑');
+            this.changeModel(false);
+          }
+        }
+        this.preLeftHandPosition = currentLeftHandPosition;
+        this.preRightHandPosition = currentRightHandPosition;
+      }
     }
   }
 
   onResults(results: any) {
-    // console.log(this.isPlaying);
+    // console.log(this.isCameraReady);
     // 绘制识别结果
     this.drawResults(results);
 

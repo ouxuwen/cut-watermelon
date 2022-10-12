@@ -44,7 +44,7 @@ export class Control {
   async start() {
     if (this.isRunning) return;
     this.isRunning = true;
-    for (let i = 0; i < range(2, 5); i++) {
+    for (let i = 0; i < range(1, 3); i++) {
       this.createRandomFruit();
     }
     const position = { x: 0, y: 0, z: 0 };
@@ -81,7 +81,7 @@ export class Control {
       this.reset({ fruit: this.bomb, physicsObj: physics.bombBox });
     }
 
-    if (this.coinSum > 100 && !physics.bombBox.isUsing) {
+    if (this.coinSum > 0 && !physics.bombBox.isUsing) {
       physics.bombBox.isUsing = true;
       this.scene.add(this.bomb);
       const positionZ = range(-0.5, 0.5);

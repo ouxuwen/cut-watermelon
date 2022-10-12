@@ -46,12 +46,12 @@ export default async function createScene() {
 
   (window as any).start = await control.start.bind(control);
   (window as any).changeModel = holisticUtils.changeModel.bind(holisticUtils);
-  (window as any).changeToHolisticDetetor =
-    holisticUtils.changeToHolisticDetetor.bind(holisticUtils);
+  (window as any).changeToHolisticDetetor = holisticUtils.changeToHolisticDetetor.bind(holisticUtils);
   (window as any).changeToPoseDetetor = holisticUtils.changeToPoseDetetor.bind(holisticUtils);
 
-  (window as any).startGame = () => {
-    holisticUtils.changeToPoseDetetor();
+  (window as any).startGame = async () => {
+    await holisticUtils.changeToPoseDetetor();
+    holisticUtils.setGameStatus(true);
     console.log('游戏开始');
     if (video.paused) {
       video.play();

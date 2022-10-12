@@ -101,7 +101,7 @@ export async function createBomb() {
       (loadedModel: any) => {
         // eslint-disable-next-line no-param-reassign
         loadedModel.children[1].material.map = textureAlbedo;
-        loadedModel.scale.set(0.1, 0.1, 0.1);
+        loadedModel.scale.set(0.15, 0.15, 0.15);
         // mesh.material.clippingPlanes = [];
         loadedModel.position.set(-0.3, -1, 0);
         resolve(loadedModel);
