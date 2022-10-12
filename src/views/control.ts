@@ -172,6 +172,7 @@ export class Control {
     }
     // 炸弹
     this.updateBomb();
+    physics.bombBox.position.x = -0.3;
     meshBindPhysics(this.bomb, physics.bombBox);
   }
 
