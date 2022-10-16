@@ -294,9 +294,10 @@ export class HolisticUtils {
 
   onResults(results: any) {
     // console.log(this.isCameraReady);
-    // 绘制识别结果
-    this.drawResults(results);
-
+    if (process.env.DEBUG_MODE) {
+      // 绘制识别结果
+      this.drawResults(results);
+    }
     // 开始动画
     modelAnimate.run(results);
   }

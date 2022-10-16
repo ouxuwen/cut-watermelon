@@ -8,6 +8,7 @@ import createScene from './Scene';
 function App() {
   useEffect(() => {
     createScene();
+    console.log('process.env.DEBUG_MODE', process.env.DEBUG_MODE);
   }, []);
 
   return (

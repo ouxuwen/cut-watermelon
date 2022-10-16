@@ -139,6 +139,9 @@ export default async function createScene() {
 
   // ----------------调试专用----------------
   // 添加坐标轴辅助器
-  const axesHelper = new THREE.AxesHelper(5);
-  scene.add(axesHelper);
+  if (process.env.DEBUG_MODE) {
+    // 绘制识别结果
+    const axesHelper = new THREE.AxesHelper(5);
+    scene.add(axesHelper);
+  }
 }
