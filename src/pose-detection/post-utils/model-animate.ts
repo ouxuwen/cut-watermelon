@@ -31,7 +31,7 @@ class ModelAnimate {
       return;
     }
 
-    const vector = new THREE.Vector3(position.x * dampener, position.y * dampener, position.z * dampener);
+    const vector = new THREE.Vector3(position.x * dampener * 2, position.y * dampener, position.z * dampener);
     Part.position.lerp(vector, lerpAmount); // interpolate
   }
 

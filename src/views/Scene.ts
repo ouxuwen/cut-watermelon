@@ -8,6 +8,14 @@ import control from './control';
 import physics from './physics';
 import fruitModel from './Model';
 
+function delay(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, ms);
+  });
+}
+
 let isCreate = false;
 
 // const rightHand = createPhysicsBox({ x: 0, y: 0, z: 0 });
@@ -49,6 +57,7 @@ export default async function createScene() {
   (window as any).startGame = async () => {
     console.log('游戏开始');
     await holisticUtils.startGame();
+    await delay(1500);
     physics.startGame();
     control.startGame();
   };
