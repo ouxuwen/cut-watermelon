@@ -136,7 +136,9 @@ export class Physics {
 
   setScene(scene: Scene) {
     this.scene = scene;
-    this.cannonDebugger = CannonDebugger(this.scene, this.world, {});
+    if (process.env.DEBUG_MODE) {
+      this.cannonDebugger = CannonDebugger(this.scene, this.world, {});
+    }
     this.startPhysicsModel = new StartPhysicsModel(this.world, this.scene);
   }
 
@@ -151,8 +153,11 @@ export class Physics {
         el.position.x = -0.3;
       });
     }
-    // Debug调试物理世界刚体
-    this.cannonDebugger.update(); // Update the CannonDebugger meshes
+    if (process.env.DEBUG_MODE) {
+      // Debug调试物理世界刚体
+      this.cannonDebugger.update(); // Update the CannonDebugger meshes
+    }
+
     // 更新手部物理模型
     if (rightHand) {
       this.rightHandBox.position = new CANNON.Vec3(rightHand.x, rightHand.y, rightHand.z);
