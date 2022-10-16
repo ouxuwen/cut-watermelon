@@ -24,7 +24,7 @@ function createMesh(
   fbxPath: string,
   texturePath: string,
   position: Position,
-  scale: number = 0.02,
+  scale: number = 0.022,
 ) {
   const fbxLoader = new FBXLoader();
   const textureAlbedo = new THREE.TextureLoader().load(texturePath);
@@ -82,7 +82,7 @@ export async function getCoinModel(position: Position) {
     '/scene-resource/fbx/ueilcjiva_LOD4.fbx',
     '/scene-resource/metal.jpeg',
     position,
-    0.02,
+    0.025,
   );
   coinMesh.rotation.z = -Math.PI * 0.5;
   const textMesh: any = await createText(position);
@@ -102,7 +102,7 @@ export async function createBomb() {
       (loadedModel: any) => {
         // eslint-disable-next-line no-param-reassign
         loadedModel.children[1].material.map = textureAlbedo;
-        loadedModel.scale.set(0.15, 0.15, 0.15);
+        loadedModel.scale.set(0.2, 0.2, 0.2);
         // mesh.material.clippingPlanes = [];
         loadedModel.position.set(-0.3, -1, 0);
         resolve(loadedModel);

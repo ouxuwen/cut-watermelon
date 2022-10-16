@@ -154,7 +154,7 @@ export class Control {
       this.reset({ fruit: this.bomb, physicsObj: physics.bombBox });
     }
 
-    if (this.coinSum > 0 && !physics.bombBox.isUsing) {
+    if (!physics.bombBox.isUsing) {
       physics.bombBox.isUsing = true;
       this.scene.add(this.bomb);
       const positionZ = range(-0.5, 0.5);
