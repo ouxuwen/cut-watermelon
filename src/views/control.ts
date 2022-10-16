@@ -4,6 +4,7 @@ import { Scene } from 'three';
 import * as CANNON from 'cannon-es';
 import physics from './physics';
 import fruitModel, { getCoinModel, createBomb } from './Model';
+import renderText from './text';
 
 export function meshBindPhysics(fruit: any, physicsObj: any) {
   if (physics && fruit) {
@@ -31,7 +32,17 @@ export class Control {
 
   bomb: any;
 
+  countDown: number;
+
+  countDownTimer: NodeJS.Timer | null;
+
+  countDownChangeCb!: (num: number) => void;
+
+  scoreChangCb!: (num: number) => void;
+
   constructor() {
+    this.countDown = 60;
+    this.countDownTimer = null;
     this.fruitList = [];
     this.coinList = [];
     this.isRunning = false;
@@ -41,9 +52,47 @@ export class Control {
     this.scene = scene;
   }
 
+  startCountDown() {
+    this.countDownTimer = setInterval(() => {
+      this.countDown--;
+
+      if (this.countDownChangeCb) {
+        this.countDownChangeCb(this.countDown);
+      }
+      if (this.countDown <= 0) {
+        clearInterval(this.countDownTimer as NodeJS.Timer);
+        this.countDownTimer = null;
+        this.endGame();
+      }
+    }, 1000);
+  }
+
+  onCountDownChange(cb: (num: number) => void) {
+    this.countDownChangeCb = cb;
+  }
+
+  onScoreChange(cb: (num: number) => void) {
+    this.scoreChangCb = cb;
+  }
+
+  endGame() {
+    this.isRunning = false;
+    this.fruitList.forEach((el) => {
+      this.reset(el);
+    });
+    this.fruitList = [];
+    this.coinList.forEach((coinMesh) => {
+      this.scene.remove(coinMesh.coin);
+      this.scene.remove(coinMesh.text);
+    });
+    this.scene.remove(this.bomb);
+    this.coinList = [];
+  }
+
   async start() {
     if (this.isRunning) return;
     this.isRunning = true;
+    this.startCountDown();
     for (let i = 0; i < range(1, 3); i++) {
       this.createRandomFruit();
     }
@@ -145,6 +194,7 @@ export class Control {
         this.reset(el);
         el.physicsObj.isCollided = false;
         this.createCoin(el);
+        this.coinSum += 10;
       }
       if (el.fruit.position.y <= -1) {
         this.reset(el);
@@ -160,18 +210,24 @@ export class Control {
     }
     // 金币处理
     if (this.coinList.length > 0) {
-      this.coinList.forEach((coinMesh) => {
+      this.coinList = this.coinList.filter((coinMesh) => {
         coinMesh.coin.position.y += 0.01;
         coinMesh.text.position.y += 0.01;
-        if (coinMesh.coin.position.y > 2) {
-          this.coinSum += 10;
+        if (coinMesh.coin.position.y > 1) {
           this.scene.remove(coinMesh.coin);
           this.scene.remove(coinMesh.text);
+          return false;
         }
+        return true;
       });
     }
     // 炸弹
     this.updateBomb();
+
+    renderText(this.scene, `Score: ${this.coinSum}`);
+    if (this.scoreChangCb) {
+      this.scoreChangCb(this.coinSum);
+    }
     physics.bombBox.position.x = -0.3;
     meshBindPhysics(this.bomb, physics.bombBox);
   }
@@ -185,3 +241,5 @@ export class Control {
     el.physicsObj.isUsing = false;
   }
 }
+
+export default new Control();

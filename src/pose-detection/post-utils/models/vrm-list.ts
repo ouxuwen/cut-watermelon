@@ -7,8 +7,8 @@ export interface VModel {
   name: string;
   model?: VRM;
 }
-const PeopleList = ['Aether.vrm', 'Katheryne.vrm', 'Kazuha.vrm', 'Keqing.vrm', 'Amber.vrm', 'Asmoday.vrm', 'Barbara.vrm', 'Bennett.vrm', 'Xiao.vrm'];
-// const PeopleList = ['Aether.vrm', 'Katheryne.vrm', 'Kazuha.vrm', 'Keqing.vrm', 'Kokomi.vrm',
+const PeopleList = ['Aether.vrm', 'Kazuha.vrm'];
+// const PeopleList = ['Aether.vrm', 'Kazuha.vrm', 'Keqing.vrm', 'Kokomi.vrm',
 //   'Amber.vrm', 'Asmoday.vrm', 'Barbara.vrm', 'Bennett.vrm', 'Xiao.vrm',
 //   'Albedo.vrm', 'Arataki-Itto.vrm', 'Ashtra.vrm', 'Baizhu.vrm', 'Beidou.vrm', 'Zhongli.vrm'];
 
