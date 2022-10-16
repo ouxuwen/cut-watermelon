@@ -99,7 +99,7 @@ export class Control {
     this.countDown = DEFAULT_COUNT;
   }
 
-  onGameStatusChange(cb: (bool: boolean)=> void) {
+  onGameStatusChange(cb: (bool: boolean) => void) {
     this.gameStatusCbList.push(cb);
   }
 

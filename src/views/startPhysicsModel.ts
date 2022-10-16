@@ -49,7 +49,7 @@ export default class StartPhysicsModel {
           scene.add(object);
 
           this.spotLight = new SpotLight(0xeeeeee);
-          this.spotLight.position.set(-0.2, 0, 0);
+          this.spotLight.position.set(-0.2, 0.4, -0.35);
           this.spotLight.visible = true;
           this.spotLight.target = object;
           scene.add(this.spotLight);

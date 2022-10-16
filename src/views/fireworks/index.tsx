@@ -4,6 +4,7 @@ import './index.less';
 
 let xPoint: number;
 let yPoint: number;
+const bomSound = new Audio('/scene-resource/fireworks.mp3');
 class Particle {
   width: number = 0;
 
@@ -42,12 +43,12 @@ class Particle {
     this.x += this.vx;
     this.vy += this.gravity;
     this.y += this.vy;
-    this.alpha -= 0.01;
+    this.alpha -= 0.005;
     if (
-      this.x <= -this.width
-      || this.x >= window.innerWidth
-      || this.y >= window.innerHeight
-      || this.alpha <= 0
+      this.x <= -this.width ||
+      this.x >= window.innerWidth ||
+      this.y >= window.innerHeight ||
+      this.alpha <= 0
     ) {
       return false;
     }
@@ -72,7 +73,7 @@ function Fireworks() {
   const [visible, setVisible] = React.useState(false);
   const canvasWidth = window.innerWidth;
   const canvasHeight = window.innerHeight;
-  const probability = 0.04;
+  const probability = 0.09;
   const canvasRef = React.createRef() as React.RefObject<HTMLCanvasElement>;
   let ctx: any;
   let particles: any[] = [];
@@ -83,8 +84,8 @@ function Fireworks() {
     const nFire = Math.random() * 50 + 100;
     // eslint-disable-next-line no-bitwise
     const c = `rgb(${~~(Math.random() * 200 + 55)},${~~(Math.random() * 200 + 55)},${~~(
-      Math.random() * 200
-      + 55
+      Math.random() * 200 +
+      55
     )})`;
     for (let i = 0; i < nFire; i++) {
       const particle = new Particle();
@@ -123,10 +124,21 @@ function Fireworks() {
     requestAnimationFrame(updateWorld);
   };
 
-  const handleGameStatusChange = React.useCallback((status: boolean) => {
-    console.log('handleGameStatusChange[', status);
-    setVisible(!status);
-  }, [visible]);
+  const handleGameStatusChange = React.useCallback(
+    (status: boolean) => {
+      console.log('handleGameStatusChange[', status);
+      setVisible(!status);
+      if (!status) {
+        bomSound.volume = 0.1;
+        bomSound.currentTime = 0;
+        bomSound.loop = true;
+        bomSound.play();
+      } else if (!visible && !bomSound.paused) {
+        bomSound.pause();
+      }
+    },
+    [visible],
+  );
 
   useEffect(() => {
     control.onGameStatusChange(handleGameStatusChange);
@@ -145,7 +157,9 @@ function Fireworks() {
 
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
-    <><canvas style={{ display: visible ? 'block' : 'none' }} ref={canvasRef} id="canvas" /></>
+    <>
+      <canvas style={{ display: visible ? 'block' : 'none' }} ref={canvasRef} id="canvas" />
+    </>
   );
 }
 export default Fireworks;
