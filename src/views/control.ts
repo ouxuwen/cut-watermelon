@@ -18,6 +18,7 @@ export function range(a: number, b: number) {
 }
 
 const DEFAULT_COUNT = 60;
+const bgmSound = new Audio('/scene-resource/bgm.mp3');
 
 export class Control {
   fruitList: any[];
@@ -82,6 +83,7 @@ export class Control {
 
   endGame() {
     this.isRunning = false;
+    bgmSound.pause();
     this.fruitList.forEach((el) => {
       this.reset(el);
     });
@@ -107,6 +109,9 @@ export class Control {
     if (this.isRunning) return;
     this.isRunning = true;
     this.coinSum = 0;
+    bgmSound.volume = 0.3;
+    bgmSound.currentTime = 0.15;
+    bgmSound.play();
     this.startCountDown();
     for (let i = 0; i < range(1, 3); i++) {
       this.createRandomFruit();
