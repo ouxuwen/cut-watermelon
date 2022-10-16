@@ -130,8 +130,9 @@ class ModelAnimate {
         'Hips',
         {
           x: riggedPose.Hips.position.x, // Reverse direction
-          y: riggedPose.Hips.position.y + 1, // Add a bit of height
+          // y: riggedPose.Hips.position.y + 1, // Add a bit of height
           z: 0,
+          y: 1,
           // z: -riggedPose.Hips.position.z, // Reverse direction
         },
         1,
