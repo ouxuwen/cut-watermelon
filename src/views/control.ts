@@ -17,7 +17,7 @@ export function range(a: number, b: number) {
   return Math.random() * (b - a) + a;
 }
 
-const DEFAULT_COUNT = 60;
+const DEFAULT_COUNT = 30;
 const bgmSound = new Audio('/scene-resource/bgm.mp3');
 
 export class Control {

@@ -10,6 +10,14 @@ function App() {
     createScene();
     console.log('process.env.DEBUG_MODE', process.env.DEBUG_MODE);
   }, []);
+  window.addEventListener('dblclick', () => {
+    const fullScreenElement = document.fullscreenElement;
+    if (fullScreenElement) {
+      document.exitFullscreen();
+    } else {
+      document.body.requestFullscreen();
+    }
+  });
 
   return (
     <div id="App">
