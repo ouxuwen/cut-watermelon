@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 // import * as dat from 'dat.gui';
 // import fontsStyle from 'three/examples/fonts/gentilis_bold.typeface.json';
 import holisticUtils from '../pose-detection/post-utils';
-import { Control } from './control';
+import control from './control';
 import physics from './physics';
 import fruitModel from './Model';
 
@@ -15,7 +15,6 @@ export default async function createScene() {
   if (isCreate) return;
   isCreate = true;
   console.log('createScene');
-  const control = new Control();
   // ----------------1.创建场景----------------
   const scene = new THREE.Scene();
   holisticUtils.setScene(scene);
