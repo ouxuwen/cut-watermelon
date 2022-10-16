@@ -43,13 +43,13 @@ export default class StartPhysicsModel {
         (object: any) => {
           object.scale.set(0.001, 0.001, 0.001);
           object.rotation.x = -Math.PI * 0.5;
-          object.rotation.z = -Math.PI * 0.5;
+          object.rotation.z = -Math.PI * 0.4;
           object.position.set(position.x, position.y, position.z);
           this.psyduckModel = object;
           scene.add(object);
 
-          this.spotLight = new SpotLight(0xeeeeee);
-          this.spotLight.position.set(-0.2, 0.4, -0.35);
+          this.spotLight = new SpotLight(0xcccccc);
+          this.spotLight.position.set(-0.25, 0.4, -0.45);
           this.spotLight.visible = true;
           this.spotLight.target = object;
           scene.add(this.spotLight);
