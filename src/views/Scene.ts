@@ -31,37 +31,32 @@ export default async function createScene() {
   // });
 
   // 图片纹理
-  const sceneTexture = new THREE.TextureLoader().load('/scene-resource/2.jpeg');
-  sceneTexture.mapping = THREE.EquirectangularReflectionMapping;
+  const sceneTexture = new THREE.TextureLoader().load('/scene-resource/scene.jpeg');
   scene.background = sceneTexture;
 
   // 视频纹理
-  const video = document.createElement('video');
-  video.src = '/scene-resource/back-movie.mp4';
-  video.loop = true;
+  // const video = document.createElement('video');
+  // video.src = '/scene-resource/back-movie.mp4';
+  // video.loop = true;
 
   // ----------------2.初始化物品----------------
   await fruitModel.initFruitModels();
 
   (window as any).start = await control.start.bind(control);
   (window as any).changeModel = holisticUtils.changeModel.bind(holisticUtils);
-  (window as any).changeToHolisticDetetor = holisticUtils.changeToHolisticDetetor.bind(holisticUtils);
+  (window as any).changeToHolisticDetetor =
+    holisticUtils.changeToHolisticDetetor.bind(holisticUtils);
   (window as any).changeToPoseDetetor = holisticUtils.changeToPoseDetetor.bind(holisticUtils);
 
   (window as any).startGame = async () => {
     await holisticUtils.changeToPoseDetetor();
     holisticUtils.setGameStatus(true);
     console.log('游戏开始');
-    if (video.paused) {
-      video.play();
-      const textureVideo = new THREE.VideoTexture(video);
-      scene.background = textureVideo;
-    }
   };
 
   // ----------------3.设置相机----------------
   const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100);
-  camera.position.set(-2, 0, 0);
+  camera.position.set(-3.2, 0, 0);
   scene.add(camera);
 
   // ----------------4.设置灯光----------------

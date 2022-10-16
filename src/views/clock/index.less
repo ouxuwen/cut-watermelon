@@ -1,18 +1,34 @@
-.clock {
-    font-size: 3em ;
-    font-weight: bold;
-    font-family: Inconsolata, monospace;
-    position: fixed;
-    display: flex;
-    justify-self: center;
-    align-items: center;
-    top: 10px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-image: -webkit-gradient(linear, 0 0, 0 bottom, from(rgb(252, 63, 6)), to(rgb(251, 255, 0)));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+.clock-container {
+  display: flex;
+  justify-self: center;
+  align-items: center;
+  top: 10px;
+  right: 10px;
+  position: fixed;
 }
- 
 
- 
+.clock {
+  font-size: 3em;
+  font-weight: bold;
+  font-family: Inconsolata, monospace;
+
+  display: flex;
+  justify-self: center;
+  align-items: center;
+
+  transform: translateX(-50%);
+  background-image: -webkit-gradient(
+    linear,
+    0 0,
+    0 bottom,
+    from(rgb(252, 63, 6)),
+    to(rgb(251, 255, 0))
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.timer {
+  width: 3em;
+  height: 3em;
+  margin-right: 3em;
+}

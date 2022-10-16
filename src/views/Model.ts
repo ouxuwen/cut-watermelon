@@ -3,6 +3,7 @@ import { Scene } from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
+// import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 import Position from './type';
 

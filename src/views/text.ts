@@ -29,8 +29,8 @@ export default function renderText(scene: THREE.Scene, message: string) {
     });
 
     currentText = new THREE.Mesh(geometry, txtMater);
-    currentText.position.set(0, 0.7, 0.6);
-    currentText.scale.set(0.1, 0.1, 0.1);
+    currentText.position.set(0, 1.15, -0.23);
+    currentText.scale.set(0.15, 0.15, 0.15);
     currentText.rotation.y = -Math.PI * 0.5;
 
     scene.add(currentText);

@@ -15,23 +15,6 @@ function App() {
       <Clock />
       {/* <Score /> */}
       <div id="three_canvas" />
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '50px',
-          height: '25px',
-          background: '#FFFFFF',
-          zIndex: 100,
-        }}
-        onPointerDown={async () => {
-          await (window as any).startGame();
-          (window as any).start();
-        }}
-      >
-        开始
-      </div>
     </div>
   );
 }
