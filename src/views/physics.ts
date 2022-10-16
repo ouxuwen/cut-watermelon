@@ -2,6 +2,7 @@ import * as CANNON from 'cannon-es';
 import { Clock, Scene } from 'three';
 import CannonDebugger from 'cannon-es-debugger';
 import Position from './type';
+import StartPhysicsModel from './startPhysicsModel';
 
 export interface Box extends CANNON.Body {
   isUsing: boolean;
@@ -33,6 +34,8 @@ export class Physics {
   public bombBox: any;
 
   private bomSound = new Audio('/scene-resource/bomb.mp3');
+
+  private startPhysicsModel!: StartPhysicsModel;
 
   constructor() {
     this.clock = new Clock();
@@ -106,6 +109,7 @@ export class Physics {
   setScene(scene: Scene) {
     this.scene = scene;
     this.cannonDebugger = CannonDebugger(this.scene, this.world, {});
+    this.startPhysicsModel = new StartPhysicsModel(this.world, this.scene);
   }
 
   update({ rightHand, leftHand }: any) {
