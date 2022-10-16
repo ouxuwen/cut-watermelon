@@ -27,8 +27,8 @@ export default class StartPhysicsModel {
     const mtlLoader = new MTLLoader();
     const position = {
       x: -0.17,
-      y: -0.55,
-      z: -0.35,
+      y: 0,
+      z: -0.8,
     };
     // 加载mtl文件
     mtlLoader.load('/scene-resource/startModel/psyduck.mtl', (material) => {
@@ -73,7 +73,7 @@ export default class StartPhysicsModel {
     const floorShape = new CANNON.Plane();
     this.floorBody = new CANNON.Body({
       mass: 0,
-      position: new CANNON.Vec3(0, -0.5, 0),
+      position: new CANNON.Vec3(0, 0, 0),
       material: defaultMaterial,
     });
     this.floorBody.addShape(floorShape);

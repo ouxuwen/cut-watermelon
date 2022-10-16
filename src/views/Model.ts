@@ -24,7 +24,7 @@ function createMesh(
   fbxPath: string,
   texturePath: string,
   position: Position,
-  scale: number = 0.015,
+  scale: number = 0.02,
 ) {
   const fbxLoader = new FBXLoader();
   const textureAlbedo = new THREE.TextureLoader().load(texturePath);

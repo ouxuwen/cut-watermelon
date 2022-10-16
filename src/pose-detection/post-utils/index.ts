@@ -80,6 +80,17 @@ export class HolisticUtils {
     // this.createThreeSence();
   }
 
+  async startGame() {
+    if (this.isGameStarting) return;
+    this.setGameStatus(true);
+    await this.changeToPoseDetetor();
+  }
+
+  async endGame() {
+    await this.changeToHolisticDetetor();
+    this.setGameStatus(false);
+  }
+
   setGameStatus(bool: boolean) {
     this.isGameStarting = bool;
     if (bool) {

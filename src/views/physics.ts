@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import * as CANNON from 'cannon-es';
 import { Clock, Scene } from 'three';
 import CannonDebugger from 'cannon-es-debugger';
@@ -40,15 +41,18 @@ export class Physics {
 
   private bomSound = new Audio('/scene-resource/bomb.mp3');
 
-  private startPhysicsModel!: StartPhysicsModel;
+  public startPhysicsModel!: StartPhysicsModel;
+
+  public isStarting: boolean;
 
   constructor() {
+    this.isStarting = false;
     this.clock = new Clock();
     this.world = new CANNON.World();
     this.world.broadphase = new CANNON.SAPBroadphase(this.world);
 
     this.world.allowSleep = false;
-    this.world.gravity.set(0, -9.82, 0);
+    this.world.gravity.set(0, -5, 0);
     const defaultMaterial = new CANNON.Material('default');
     // friction 表示摩擦力，restitution 为弹性，1 为回弹到原始位置
     const defaultContactMaterial = new CANNON.ContactMaterial(defaultMaterial, defaultMaterial, {
@@ -57,7 +61,7 @@ export class Physics {
     });
     this.world.addContactMaterial(defaultContactMaterial);
     this.physicsBoxs = [];
-    this.leftHandBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 1 }, 0.08, 0);
+    this.leftHandBox = this.createPhysicsBox({ x: DefaultX, y: DefaultY, z: 1 }, DefaultR, 0);
     this.leftHandBox.id = LeftHandBoxId;
     this.leftHandBox.addEventListener('collide', this.handCollided);
 
@@ -69,6 +73,19 @@ export class Physics {
     this.bombBox.isUsing = false;
     this.bombBox.isCollided = false;
     this.bombBox.id = BombBoxId;
+
+    this.createDefaultBoxs();
+  }
+
+  startGame() {
+    this.isStarting = true;
+    this.startPhysicsModel.removeBody();
+    this.resetDefaultBoxs();
+  }
+
+  endGame() {
+    this.isStarting = false;
+    this.resetDefaultBoxs(1);
   }
 
   handCollided = async (e: any) => {
@@ -79,33 +96,42 @@ export class Physics {
       this.bombBox.isCollided = true;
     }
     if (Math.abs(e.body.id - PsyduckId) < Number.EPSILON) {
-      this.startPhysicsModel.removeBody();
-      if (this.physicsBoxs.length > 0) return;
-      const hitSound = new Audio('/scene-resource/coin.mp3');
-      for (let i = 0; i < 10; i++) {
-        const box = this.createPhysicsBox({ x: -0.3, y: -1, z: (i - 5) * 0.2 }) as unknown as Box;
-        box.isUsing = false;
-        box.isCollided = false;
-        box.id = i + 1;
-        box.addEventListener('collide', (arg: any) => {
-          if (arg.body.id > HandBoxIdLimit) {
-            // eslint-disable-next-line no-param-reassign
-            arg.target.isCollided = true;
-            const impactStrength = arg.contact.getImpactVelocityAlongNormal();
-            if (impactStrength > 1.5) {
-              hitSound.volume = Math.random();
-              hitSound.currentTime = 0;
-              hitSound.play();
-            }
-          }
-        });
-        this.physicsBoxs.push(box);
-      }
-
-      await (window as any).startGame();
-      (window as any).start();
+      (window as any).startGame();
     }
   };
+
+  resetDefaultBoxs(x = DefaultX) {
+    this.physicsBoxs.forEach((el: Box) => {
+      el.position = new CANNON.Vec3(x, -1, (el.id - 5) * 0.2);
+      el.velocity.y = 0;
+      el.velocity.z = 0;
+      el.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 0), 0);
+      el.isUsing = false;
+    });
+  }
+
+  createDefaultBoxs() {
+    const hitSound = new Audio('/scene-resource/coin.mp3');
+    for (let i = 0; i < 10; i++) {
+      const box = this.createPhysicsBox({ x: 1, y: 0, z: (i - 5) * 0.2 }) as unknown as Box;
+      box.isUsing = false;
+      box.isCollided = false;
+      box.id = i + 1;
+      box.addEventListener('collide', (arg: any) => {
+        if (arg.body.id > HandBoxIdLimit) {
+          // eslint-disable-next-line no-param-reassign
+          arg.target.isCollided = true;
+          const impactStrength = arg.contact.getImpactVelocityAlongNormal();
+          if (impactStrength > 1.5) {
+            hitSound.volume = Math.random();
+            hitSound.currentTime = 0;
+            hitSound.play();
+          }
+        }
+      });
+      this.physicsBoxs.push(box);
+    }
+  }
 
   setScene(scene: Scene) {
     this.scene = scene;
@@ -118,10 +144,12 @@ export class Physics {
     const deltaTime = elapsedTime - this.oldElapsedTime;
     this.oldElapsedTime = elapsedTime;
     this.world.fixedStep(1 / 60, deltaTime);
-    this.physicsBoxs.forEach((el) => {
-      // eslint-disable-next-line no-param-reassign
-      el.position.x = -0.3;
-    });
+    if (this.isStarting) {
+      this.physicsBoxs.forEach((el) => {
+        // eslint-disable-next-line no-param-reassign
+        el.position.x = -0.3;
+      });
+    }
     // Debug调试物理世界刚体
     this.cannonDebugger.update(); // Update the CannonDebugger meshes
     // 更新手部物理模型

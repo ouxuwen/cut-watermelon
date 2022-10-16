@@ -17,6 +17,8 @@ export function range(a: number, b: number) {
   return Math.random() * (b - a) + a;
 }
 
+const DEFAULT_COUNT = 60;
+
 export class Control {
   fruitList: any[];
 
@@ -40,11 +42,14 @@ export class Control {
 
   scoreChangCb!: (num: number) => void;
 
+  endGameCbList: any[];
+
   constructor() {
-    this.countDown = 60;
+    this.countDown = DEFAULT_COUNT;
     this.countDownTimer = null;
     this.fruitList = [];
     this.coinList = [];
+    this.endGameCbList = [];
     this.isRunning = false;
   }
 
@@ -87,11 +92,21 @@ export class Control {
     });
     this.scene.remove(this.bomb);
     this.coinList = [];
+
+    this.endGameCbList.forEach((el) => {
+      el();
+    });
+    this.countDown = DEFAULT_COUNT;
   }
 
-  async start() {
+  onEndGame(cb: ()=> void) {
+    this.endGameCbList.push(cb);
+  }
+
+  async startGame() {
     if (this.isRunning) return;
     this.isRunning = true;
+    this.coinSum = 0;
     this.startCountDown();
     for (let i = 0; i < range(1, 3); i++) {
       this.createRandomFruit();
@@ -115,7 +130,7 @@ export class Control {
         z = range(2 - absZ * 0.2, 2.2 - absZ * 0.2);
       }
 
-      physicsObj.velocity.y = range(5, 5.5);
+      physicsObj.velocity.y = 4;
       physicsObj.velocity.z = z;
 
       this.fruitList.push({
@@ -137,7 +152,7 @@ export class Control {
       physics.bombBox.position.z = positionZ;
       const z = range(2 - positionZ, 2.2 - positionZ);
 
-      physics.bombBox.velocity.y = range(5, 5.5);
+      physics.bombBox.velocity.y = 4;
       physics.bombBox.velocity.z = positionZ > 0 ? -z : z;
     }
     if (physics.bombBox.isCollided) {
@@ -181,7 +196,7 @@ export class Control {
         z = range(2 - absZ * 0.2, 2.2 - absZ * 0.2);
       }
 
-      el.physicsObj.velocity.y = range(5, 5.5);
+      el.physicsObj.velocity.y = 4;
       el.physicsObj.velocity.z = z;
     });
   }
