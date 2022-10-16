@@ -13,14 +13,15 @@ function Clock() {
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
-      { (countDown < 60 && countDown > 0)
-        ? (
-          <div className="clock">
-            {countDown < 10 ? `0${countDown}` : countDown}
-          </div>
-        ) : ''}
+      {countDown < 60 && countDown > 0 ? (
+        <div className="clock-container">
+          <img className="timer" src="/scene-resource/timer.svg" alt="Timer" />
+          <div className="clock">{countDown < 10 ? `0${countDown}` : countDown}</div>
+        </div>
+      ) : (
+        ''
+      )}
     </>
-
   );
 }
 

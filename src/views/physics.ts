@@ -2,6 +2,7 @@ import * as CANNON from 'cannon-es';
 import { Clock, Scene } from 'three';
 import CannonDebugger from 'cannon-es-debugger';
 import Position from './type';
+import StartPhysicsModel from './startPhysicsModel';
 
 export interface Box extends CANNON.Body {
   isUsing: boolean;
@@ -12,6 +13,7 @@ const LeftHandBoxId = 10011;
 const RightHandBoxId = 10012;
 const HandBoxIdLimit = 10010;
 const BombBoxId = 10000;
+const PsyduckId = 20000;
 
 const DefaultY = -1; // 物理模型起始y 坐标
 const DefaultX = -0.3; // 默认x 轴坐标
@@ -38,6 +40,8 @@ export class Physics {
 
   private bomSound = new Audio('/scene-resource/bomb.mp3');
 
+  private startPhysicsModel!: StartPhysicsModel;
+
   constructor() {
     this.clock = new Clock();
     this.world = new CANNON.World();
@@ -52,39 +56,8 @@ export class Physics {
       restitution: 0,
     });
     this.world.addContactMaterial(defaultContactMaterial);
-
-    // 为了防止物体一直下降影响性能，设置底部，以便物体停止运动后处于sleep状态
-    // const floorShape = new CANNON.Plane();
-    // const floorBody = new CANNON.Body({
-    //   mass: 0,
-    //   position: new CANNON.Vec3(0, -1, 0),
-    //   material: defaultMaterial,
-    // });
-    // floorBody.addShape(floorShape);
-    // this.world.addBody(floorBody);
-    // // setFromAxisAngle方法第一个参数是旋转轴，第二个参数是角度，为了能够让地面平过来
-    // floorBody.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
-    const hitSound = new Audio('/scene-resource/coin.mp3');
     this.physicsBoxs = [];
-    for (let i = 0; i < 10; i++) {
-      const box = this.createPhysicsBox({ x: DefaultX, y: DefaultY, z: (i - 5) * 0.2 }) as unknown as Box;
-      box.isUsing = false;
-      box.isCollided = false;
-      box.id = i + 1;
-      box.addEventListener('collide', (e: any) => {
-        if (e.body.id > HandBoxIdLimit) {
-          e.target.isCollided = true;
-          const impactStrength = e.contact.getImpactVelocityAlongNormal();
-          if (impactStrength > 1.5) {
-            hitSound.volume = Math.random();
-            hitSound.currentTime = 0;
-            hitSound.play();
-          }
-        }
-      });
-      this.physicsBoxs.push(box);
-    }
-    this.leftHandBox = this.createPhysicsBox({ x: DefaultX, y: DefaultY, z: 1 }, DefaultR, 0);
+    this.leftHandBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 1 }, 0.08, 0);
     this.leftHandBox.id = LeftHandBoxId;
     this.leftHandBox.addEventListener('collide', this.handCollided);
 
@@ -98,18 +71,46 @@ export class Physics {
     this.bombBox.id = BombBoxId;
   }
 
-  handCollided = (e: any) => {
+  handCollided = async (e: any) => {
     if (Math.abs(e.body.id - BombBoxId) < Number.EPSILON) {
       this.bomSound.volume = Math.random();
       this.bomSound.currentTime = 0;
       this.bomSound.play();
       this.bombBox.isCollided = true;
     }
+    if (Math.abs(e.body.id - PsyduckId) < Number.EPSILON) {
+      this.startPhysicsModel.removeBody();
+      if (this.physicsBoxs.length > 0) return;
+      const hitSound = new Audio('/scene-resource/coin.mp3');
+      for (let i = 0; i < 10; i++) {
+        const box = this.createPhysicsBox({ x: -0.3, y: -1, z: (i - 5) * 0.2 }) as unknown as Box;
+        box.isUsing = false;
+        box.isCollided = false;
+        box.id = i + 1;
+        box.addEventListener('collide', (arg: any) => {
+          if (arg.body.id > HandBoxIdLimit) {
+            // eslint-disable-next-line no-param-reassign
+            arg.target.isCollided = true;
+            const impactStrength = arg.contact.getImpactVelocityAlongNormal();
+            if (impactStrength > 1.5) {
+              hitSound.volume = Math.random();
+              hitSound.currentTime = 0;
+              hitSound.play();
+            }
+          }
+        });
+        this.physicsBoxs.push(box);
+      }
+
+      await (window as any).startGame();
+      (window as any).start();
+    }
   };
 
   setScene(scene: Scene) {
     this.scene = scene;
     this.cannonDebugger = CannonDebugger(this.scene, this.world, {});
+    this.startPhysicsModel = new StartPhysicsModel(this.world, this.scene);
   }
 
   update({ rightHand, leftHand }: any) {
