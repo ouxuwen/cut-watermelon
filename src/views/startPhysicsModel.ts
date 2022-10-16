@@ -101,4 +101,11 @@ export default class StartPhysicsModel {
     this.scene.remove(this.psyduckModel);
     this.scene.remove(this.spotLight);
   }
+
+  reset() {
+    this.world.addBody(this.floorBody);
+    this.world.addBody(this.sphereBody);
+    this.scene.add(this.psyduckModel);
+    this.scene.add(this.spotLight);
+  }
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import control from '../control';
 import './index.less';
 
@@ -44,10 +44,10 @@ class Particle {
     this.y += this.vy;
     this.alpha -= 0.01;
     if (
-      this.x <= -this.width ||
-      this.x >= window.innerWidth ||
-      this.y >= window.innerHeight ||
-      this.alpha <= 0
+      this.x <= -this.width
+      || this.x >= window.innerWidth
+      || this.y >= window.innerHeight
+      || this.alpha <= 0
     ) {
       return false;
     }
@@ -69,11 +69,11 @@ class Particle {
 }
 
 function Fireworks() {
-  const [countDown, setCountDown] = useState(control.countDown);
-
+  const [visible, setVisible] = React.useState(false);
   const canvasWidth = window.innerWidth;
   const canvasHeight = window.innerHeight;
   const probability = 0.04;
+  const canvasRef = React.createRef() as React.RefObject<HTMLCanvasElement>;
   let ctx: any;
   let particles: any[] = [];
 
@@ -83,8 +83,8 @@ function Fireworks() {
     const nFire = Math.random() * 50 + 100;
     // eslint-disable-next-line no-bitwise
     const c = `rgb(${~~(Math.random() * 200 + 55)},${~~(Math.random() * 200 + 55)},${~~(
-      Math.random() * 200 +
-      55
+      Math.random() * 200
+      + 55
     )})`;
     for (let i = 0; i < nFire; i++) {
       const particle = new Particle();
@@ -123,12 +123,15 @@ function Fireworks() {
     requestAnimationFrame(updateWorld);
   };
 
-  useEffect(() => {
-    control.onCountDownChange((num) => {
-      setCountDown(num);
-    });
+  const handleGameStatusChange = React.useCallback((status: boolean) => {
+    console.log('handleGameStatusChange[', status);
+    setVisible(!status);
+  }, [visible]);
 
-    const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  useEffect(() => {
+    control.onGameStatusChange(handleGameStatusChange);
+    const canvas = canvasRef.current;
+    console.log(canvas);
     if (canvas) {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -142,7 +145,7 @@ function Fireworks() {
 
   return (
     // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>{countDown < 0 ? <canvas id="canvas" /> : ''}</>
+    <><canvas style={{ display: visible ? 'block' : 'none' }} ref={canvasRef} id="canvas" /></>
   );
 }
 export default Fireworks;

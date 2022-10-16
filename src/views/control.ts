@@ -42,14 +42,14 @@ export class Control {
 
   scoreChangCb!: (num: number) => void;
 
-  endGameCbList: any[];
+  gameStatusCbList: any[];
 
   constructor() {
     this.countDown = DEFAULT_COUNT;
     this.countDownTimer = null;
     this.fruitList = [];
     this.coinList = [];
-    this.endGameCbList = [];
+    this.gameStatusCbList = [];
     this.isRunning = false;
   }
 
@@ -93,14 +93,14 @@ export class Control {
     this.scene.remove(this.bomb);
     this.coinList = [];
 
-    this.endGameCbList.forEach((el) => {
-      el();
+    this.gameStatusCbList.forEach((el) => {
+      el(false);
     });
     this.countDown = DEFAULT_COUNT;
   }
 
-  onEndGame(cb: ()=> void) {
-    this.endGameCbList.push(cb);
+  onGameStatusChange(cb: (bool: boolean)=> void) {
+    this.gameStatusCbList.push(cb);
   }
 
   async startGame() {
@@ -115,6 +115,10 @@ export class Control {
     const { coinMesh, textMesh } = await getCoinModel(position);
     this.coinModel = { coin: coinMesh, text: textMesh };
     this.bomb = await createBomb();
+
+    this.gameStatusCbList.forEach((el) => {
+      el(true);
+    });
   }
 
   createRandomFruit() {

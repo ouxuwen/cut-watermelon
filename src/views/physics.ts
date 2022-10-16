@@ -85,6 +85,7 @@ export class Physics {
 
   endGame() {
     this.isStarting = false;
+    this.startPhysicsModel.reset();
     this.resetDefaultBoxs(1);
   }
 

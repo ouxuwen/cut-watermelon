@@ -53,9 +53,11 @@ export default async function createScene() {
     control.startGame();
   };
 
-  control.onEndGame(async () => {
-    await holisticUtils.endGame();
-    physics.endGame();
+  control.onGameStatusChange(async (bool: boolean) => {
+    if (!bool) {
+      await holisticUtils.endGame();
+      physics.endGame();
+    }
   });
 
   // ----------------3.设置相机----------------
