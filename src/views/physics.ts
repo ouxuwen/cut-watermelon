@@ -13,6 +13,10 @@ const RightHandBoxId = 10012;
 const HandBoxIdLimit = 10010;
 const BombBoxId = 10000;
 
+const DefaultY = -1; // 物理模型起始y 坐标
+const DefaultX = -0.3; // 默认x 轴坐标
+const DefaultR = 0.08; // 默认物理半径
+
 export class Physics {
   private world: CANNON.World;
 
@@ -63,7 +67,7 @@ export class Physics {
     const hitSound = new Audio('/scene-resource/coin.mp3');
     this.physicsBoxs = [];
     for (let i = 0; i < 10; i++) {
-      const box = this.createPhysicsBox({ x: -0.3, y: -1, z: (i - 5) * 0.2 }) as unknown as Box;
+      const box = this.createPhysicsBox({ x: DefaultX, y: DefaultY, z: (i - 5) * 0.2 }) as unknown as Box;
       box.isUsing = false;
       box.isCollided = false;
       box.id = i + 1;
@@ -80,15 +84,15 @@ export class Physics {
       });
       this.physicsBoxs.push(box);
     }
-    this.leftHandBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 1 }, 0.08, 0);
+    this.leftHandBox = this.createPhysicsBox({ x: DefaultX, y: DefaultY, z: 1 }, DefaultR, 0);
     this.leftHandBox.id = LeftHandBoxId;
     this.leftHandBox.addEventListener('collide', this.handCollided);
 
-    this.rightHandBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 1 }, 0.08, 0);
+    this.rightHandBox = this.createPhysicsBox({ x: DefaultX, y: DefaultY, z: 1 }, DefaultR, 0);
     this.rightHandBox.id = RightHandBoxId;
     this.rightHandBox.addEventListener('collide', this.handCollided);
 
-    this.bombBox = this.createPhysicsBox({ x: -0.3, y: -1, z: 3 }, 0.08, 2);
+    this.bombBox = this.createPhysicsBox({ x: DefaultX, y: DefaultY, z: 3 }, DefaultR, 2);
     this.bombBox.isUsing = false;
     this.bombBox.isCollided = false;
     this.bombBox.id = BombBoxId;
@@ -147,7 +151,7 @@ export class Physics {
   //   return null;
   // }
 
-  createPhysicsBox(position: Position, r = 0.08, mass = 1) {
+  createPhysicsBox(position: Position, r = DefaultR, mass = 1) {
     // Sphere参数为球体的半径
     const sphereShape = new CANNON.Box(new CANNON.Vec3(r, r, r));
     const defaultMaterial = new CANNON.Material('default');
