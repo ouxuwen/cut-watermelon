@@ -129,7 +129,7 @@ function Fireworks() {
       console.log('handleGameStatusChange[', status);
       setVisible(!status);
       if (!status) {
-        bomSound.volume = 0.1;
+        bomSound.volume = 0.5;
         bomSound.currentTime = 0;
         bomSound.loop = true;
         bomSound.play();
