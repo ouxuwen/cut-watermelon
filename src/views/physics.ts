@@ -160,10 +160,10 @@ export class Physics {
 
     // 更新手部物理模型
     if (rightHand) {
-      this.rightHandBox.position = new CANNON.Vec3(rightHand.x, rightHand.y, rightHand.z);
+      this.rightHandBox.position = new CANNON.Vec3(this.isStarting ? rightHand.x : -0.3, rightHand.y, rightHand.z);
     }
     if (leftHand) {
-      this.leftHandBox.position = new CANNON.Vec3(leftHand.x, leftHand.y, leftHand.z);
+      this.leftHandBox.position = new CANNON.Vec3(this.isStarting ? leftHand.x : -0.3, leftHand.y, leftHand.z);
     }
   }
 

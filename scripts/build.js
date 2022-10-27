@@ -25,6 +25,7 @@ const printBuildError = require('react-dev-utils/printBuildError');
 
 const { measureFileSizesBeforeBuild } = FileSizeReporter;
 const { printFileSizesAfterBuild } = FileSizeReporter;
+const paths = require('../config/paths');
 const useYarn = fs.existsSync(paths.yarnLockFile);
 
 // These sizes are pretty large. We'll warn for bundles exceeding them.
@@ -41,14 +42,15 @@ if (!checkRequiredFiles([paths.appHtml, paths.appIndexJs])) {
 const argv = process.argv.slice(2);
 const writeStatsJson = argv.indexOf('--stats') !== -1;
 
+const configFactory = require('../config/webpack.config');
 // Generate configuration
 const config = configFactory('production');
 
 // We require that you explicitly set browsers and do not fall back to
 // browserslist defaults.
 const { checkBrowsers } = require('react-dev-utils/browsersHelper');
-const paths = require('../config/paths');
-const configFactory = require('../config/webpack.config');
+
+
 
 checkBrowsers(paths.appPath, isInteractive)
   .then(() =>
