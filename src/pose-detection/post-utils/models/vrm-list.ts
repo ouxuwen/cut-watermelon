@@ -7,9 +7,8 @@ export interface VModel {
   name: string;
   model?: VRM;
 }
-const PeopleList = ['Aether.vrm', 'Kazuha.vrm'];
-// const PeopleList = ['Aether.vrm', 'Kazuha.vrm', 'Keqing.vrm', 'Kokomi.vrm',
-//   'Barbara.vrm', 'Bennett.vrm', 'Xiao.vrm', 'Albedo.vrm'];
+// const PeopleList = ['Aether.vrm', 'Kazuha.vrm'];
+const PeopleList = ['Aether.vrm', 'Kazuha.vrm', 'Keqing.vrm', 'Kokomi.vrm', 'Bennett.vrm', 'Xiao.vrm', 'Albedo.vrm'];
 
 export function loadModel(name: string): Promise<VRM> {
   return new Promise((resolve, reject) => {

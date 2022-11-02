@@ -8,6 +8,12 @@ import Position from './type';
 
 const PsyduckId = 20000;
 
+const defaultPosition = {
+  x: -0.17,
+  y: 0,
+  z: -0.8,
+};
+
 export default class StartPhysicsModel {
   private world: CANNON.World;
 
@@ -25,11 +31,7 @@ export default class StartPhysicsModel {
     this.world = world;
     this.scene = scene;
     const mtlLoader = new MTLLoader();
-    const position = {
-      x: -0.17,
-      y: 0,
-      z: -0.8,
-    };
+
     // 加载mtl文件
     mtlLoader.load('/scene-resource/startModel/psyduck.mtl', (material) => {
       const loader = new OBJLoader();
@@ -44,7 +46,7 @@ export default class StartPhysicsModel {
           object.scale.set(0.001, 0.001, 0.001);
           object.rotation.x = -Math.PI * 0.5;
           object.rotation.z = -Math.PI * 0.4;
-          object.position.set(position.x, position.y, position.z);
+          object.position.set(defaultPosition.x, defaultPosition.y, defaultPosition.z);
           this.psyduckModel = object;
           scene.add(object);
 
@@ -64,7 +66,7 @@ export default class StartPhysicsModel {
         },
       );
     });
-    this.createPhysicsBox(position);
+    this.createPhysicsBox(defaultPosition);
   }
 
   createPhysicsBox(position: Position) {
@@ -107,5 +109,7 @@ export default class StartPhysicsModel {
     this.world.addBody(this.sphereBody);
     this.scene.add(this.psyduckModel);
     this.scene.add(this.spotLight);
+
+    this.sphereBody.position = new CANNON.Vec3(defaultPosition.x - 0.1, defaultPosition.y + 0.2, defaultPosition.z);
   }
 }
