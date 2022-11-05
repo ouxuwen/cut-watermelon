@@ -3,7 +3,7 @@ import PostPreview from '../pose-detection/post-preview/post-preview';
 // import Score from './score';
 import Clock from './clock';
 import Fireworks from './fireworks';
-import createScene from './Scene';
+import createScene from '../scene/scene';
 
 function App() {
   useEffect(() => {

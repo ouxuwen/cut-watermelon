@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import control from '../control';
+import control from '../../scene/control';
 import './index.less';
 
 function Clock() {

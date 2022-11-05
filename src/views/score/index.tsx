@@ -10,7 +10,7 @@ import num6 from '../../assets/numbers/number-6.svg';
 import num7 from '../../assets/numbers/number-7.svg';
 import num8 from '../../assets/numbers/number-8.svg';
 import num9 from '../../assets/numbers/number-9.svg';
-import control from '../control';
+import control from '../../scene/control';
 
 const nums = [num0, num1, num2, num3, num4, num5, num6, num7, num8, num9];
 function Score() {

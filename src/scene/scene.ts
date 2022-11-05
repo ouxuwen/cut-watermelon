@@ -6,7 +6,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import holisticUtils from '../pose-detection/post-utils';
 import control from './control';
 import physics from './physics';
-import fruitModel from './Model';
+import fruitModel from './model';
 
 function delay(ms: number) {
   return new Promise((resolve) => {

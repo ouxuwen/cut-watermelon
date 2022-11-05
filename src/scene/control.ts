@@ -3,7 +3,7 @@ import { Scene } from 'three';
 /* eslint-disable import/prefer-default-export */
 import * as CANNON from 'cannon-es';
 import physics from './physics';
-import fruitModel, { getCoinModel, createBomb } from './Model';
+import fruitModel, { getCoinModel, createBomb } from './model';
 import renderText from './text';
 
 export function meshBindPhysics(fruit: any, physicsObj: any) {
