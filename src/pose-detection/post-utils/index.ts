@@ -294,6 +294,7 @@ export class HolisticUtils {
 
   onResults(results: any) {
     // console.log(this.isCameraReady);
+    this.drawResults(results);
     if (process.env.DEBUG_MODE) {
       // 绘制识别结果
       this.drawResults(results);
